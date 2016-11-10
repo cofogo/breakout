@@ -1,0 +1,13 @@
+================
+BREAKOUT FOR TWO
+================
+
+Breakout for two is a training exercice with the goal to make something possibly usefull and/or fun along the way.
+
+The twist on the tried and true formula is that there are two players - one at the top and one at the bottom. When a ball hits a brick, the score is counted towards the player whose paddle last touched the ball.
+
+Who gets the ball first? - both players, the game starts with two balls.
+
+IDEA
+----
+Tint the playing balls with the colour of the player whose paddle last touched the ball.
