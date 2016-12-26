@@ -11,6 +11,8 @@ using std::string;
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
+#include "Paddle.h"
+
 const int win_w = 800;
 const int win_h = 640;
 
@@ -18,14 +20,9 @@ int init(); //initialise SDL
 int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
 										const int& _w, const int& _h);
 int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
-int load_media(vector<SDL_Surface*>& _srfs, SDL_Surface* _format);
-int load_textures(vector<SDL_Texture*>& _texs, SDL_Renderer* _ren);
-void close(SDL_Window*& _win, SDL_Renderer*& _ren,
-           vector<SDL_Surface*>& _srfs, vector<SDL_Texture*> _texs);
+void close(SDL_Window*& _win, SDL_Renderer*& _ren);
 SDL_Surface* load_surface(const string& _path);
-SDL_Surface* optimise_surface(SDL_Surface* _srf, SDL_Surface* _format);
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren);
-void debug(const string& _s);
 
 int main(int argc, char* args[])
 {
@@ -38,35 +35,24 @@ int main(int argc, char* args[])
 	SDL_Surface* srf_main = NULL;
 	SDL_Renderer* ren_main = NULL;
 	
-	vector<SDL_Surface*> srfs;
-	vector<SDL_Texture*> texs;
-	enum bmps {
-		srf_action_x,
-		srf_press_up, srf_press_dn, srf_press_lf, srf_press_rt
-	};
-	
 	if(create_main_win(win_main, srf_main, win_w, win_h) != 0) {
-		close(win_main, ren_main, srfs, texs);
+		close(win_main, ren_main);
 		return 1;
 	}
 	
 	if(create_win_renderer(win_main, ren_main) != 0) {
-		close(win_main, ren_main, srfs, texs);
+		close(win_main, ren_main);
 		return 1;
 	}
 	
-	/*if(load_media(srfs, srf_main) != 0) {
-		close(win_main, ren_main, srfs, texs);
-		return 1;
-	}*/
-	
-	if(load_textures(texs, ren_main) != 0) {
-		close(win_main, ren_main, srfs, texs);
-		return 1;
-	}
+	//TODO move game logic out of main
+	Paddle paddle0(300, 550);
+	paddle0.assign_texture(load_texture("assets/gfx/paddle.png", ren_main));
+	if(paddle0.get_texture() == 0) cout << "WARNING: paddle texture NULL!\n";
 	
 	//main loop
 	bool flag_quit = false;
+	SDL_SetRenderDrawColor(ren_main, 0x00, 0x20, 0x20, 0xff);
 	while(flag_quit == false) {
 		SDL_Surface* srf_current = NULL;
 		SDL_Event event;
@@ -75,17 +61,21 @@ int main(int argc, char* args[])
 				flag_quit = true;
 			}
 			
-			if(srf_current != NULL) {
-				SDL_BlitSurface(srf_current, NULL, srf_main, NULL);
-				SDL_UpdateWindowSurface(win_main);
-			}
+			//render sequence
+			SDL_RenderClear(ren_main);
+			
+			paddle0.render(ren_main);
+			
+			SDL_RenderPresent(ren_main);
 		}
 	}
 	
 	//clear screen, copy texture on, refresh (present)
+	//TODO decide if there should be an exit animaiton, make a proper one if yes
 	for(unsigned short i = 0; i < win_h; ++i) {
+		SDL_SetRenderDrawColor(ren_main, 0xff, 0xff, 0xff, 0xff);
 		SDL_RenderClear(ren_main);
-		SDL_RenderCopy(ren_main, texs[srf_action_x], NULL, NULL);
+		//SDL_RenderCopy(ren_main, texs[srf_action_x], NULL, NULL);
 		
 		//draw primitives
 		SDL_Rect shape_rect0 = {i, (win_h / 2) + 20, win_w / 10, win_h / 10};
@@ -129,14 +119,15 @@ int main(int argc, char* args[])
 		}
 		
 		SDL_RenderPresent(ren_main);
-		SDL_Delay(5);
+		SDL_Delay(3);
 	}
+	
 	
 	SDL_RenderPresent(ren_main);
 	
-	SDL_Delay(1500);
+	SDL_Delay(200);
 	
-	close(win_main, ren_main, srfs, texs);
+	close(win_main, ren_main);
 	return 0;
 }
 
@@ -192,8 +183,7 @@ int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren)
 	return 0;
 }
 
-void close(SDL_Window*& _win, SDL_Renderer*& _ren,
-           vector<SDL_Surface*>& _srfs, vector<SDL_Texture*> _texs)
+void close(SDL_Window*& _win, SDL_Renderer*& _ren)
 {
 	if(_win != NULL) {SDL_DestroyWindow(_win);}
 	_win = NULL;
@@ -201,75 +191,8 @@ void close(SDL_Window*& _win, SDL_Renderer*& _ren,
 	if(_ren != NULL) {SDL_DestroyRenderer(_ren);}
 	_ren = NULL;
 	
-	for(unsigned i = 0; i < 0; ++i) {
-		if(_srfs[i] != NULL) {
-			SDL_FreeSurface(_srfs[i]);
-			_srfs[i] = NULL;
-		}
-		
-		if(_texs[i] != NULL) {
-			SDL_DestroyTexture(_texs[i]);
-			_texs[i] = NULL;
-		}
-	}
-	
 	IMG_Quit();
 	SDL_Quit();
-}
-
-int load_media(vector<SDL_Surface*>& _srfs, SDL_Surface* _format)
-{	
-	if(_srfs.size() > 0) {
-		cerr << "ERROR: load_media received unclean array.\n";
-		return 1;
-	}
-	if(_format == NULL) {
-		cerr << "ERROR: load_media received NULL format.\n";
-		return 1;
-	}
-	
-	vector<string> fnames;
-	fnames.push_back(string("action_x.png"));
-	
-	cout << "loading graphics assets... ";
-	for(unsigned i = 0; i < fnames.size(); ++i) {
-		SDL_Surface* temp_surf = load_surface(fnames[i]);
-		_srfs.push_back(optimise_surface(temp_surf, _format));
-		if(_srfs[i] == NULL) {
-			return 1;
-		}
-	}
-	cout << "DONE(" << _srfs.size() << " assets)\n";
-	
-	return 0;
-}
-
-int load_textures(vector<SDL_Texture*>& _texs, SDL_Renderer* _ren)
-{
-	if(_texs.size() > 0) {
-		cerr << "load_textures received unclean array.\n";
-		return 1;
-	}
-	if(_ren == NULL) {
-		cerr << "load_textures received NULL renderer.\n";
-		return 1;
-	}
-	
-	//TODO fill the names array in a separate function
-	//TODO consider using a map or an array of some double valued structure to store both the name and the data, but think about performance implications of doing so.
-	vector<string> fnames;
-	fnames.push_back(string("action_x.png"));
-	
-	cout << "loading textures... ";
-	for(unsigned i = 0; i < fnames.size(); ++i) {
-		_texs.push_back(load_texture(fnames[i], _ren));
-		if(_texs[i] == NULL) {
-			return 1;
-		}
-	}
-	cout << "DONE(" << _texs.size() << " assets)\n";
-	
-	return 0;
 }
 
 SDL_Surface* load_surface(const string& _path)
@@ -283,20 +206,6 @@ SDL_Surface* load_surface(const string& _path)
 	}
 	
 	return loaded;
-}
-
-SDL_Surface* optimise_surface(SDL_Surface* _srf, SDL_Surface* _format)
-{
-	SDL_Surface* optimised = NULL;
-	
-	optimised = SDL_ConvertSurface(_srf, _format->format, 0);
-	if(optimised == NULL){
-		cerr << "ERROR: Could not optimise surface!\n";
-		cerr << "SDL error = " << SDL_GetError() << endl;
-		return NULL;
-	}
-	
-	return optimised;
 }
 
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren)
@@ -319,9 +228,4 @@ SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren)
 	SDL_FreeSurface(tmp_surf);
 	
 	return tex;
-}
-
-void debug(const string& _s)
-{
-	cout << "DEBUG: " << _s << endl;
 }
