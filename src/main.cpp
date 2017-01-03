@@ -23,6 +23,7 @@ int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
 void close(SDL_Window*& _win, SDL_Renderer*& _ren);
 SDL_Surface* load_surface(const string& _path);
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren);
+void outro(SDL_Renderer* _ren, const int& _win_w, const int& _win_h);
 
 int main(int argc, char* args[])
 {
@@ -70,62 +71,7 @@ int main(int argc, char* args[])
 		}
 	}
 	
-	//clear screen, copy texture on, refresh (present)
-	//TODO decide if there should be an exit animaiton, make a proper one if yes
-	for(unsigned short i = 0; i < win_h; ++i) {
-		SDL_SetRenderDrawColor(ren_main, 0xff, 0xff, 0xff, 0xff);
-		SDL_RenderClear(ren_main);
-		//SDL_RenderCopy(ren_main, texs[srf_action_x], NULL, NULL);
-		
-		//draw primitives
-		SDL_Rect shape_rect0 = {i, (win_h / 2) + 20, win_w / 10, win_h / 10};
-		SDL_Rect shape_rect1 = {win_w - i, (win_h / 2) - 20, 
-		                        (win_w / 2) - i, (win_h / 2) - i};
-		SDL_SetRenderDrawColor(ren_main, 0xcc, 0xcc, 0xff, 0xff);
-		SDL_RenderFillRect(ren_main, &shape_rect0);
-		
-		SDL_SetRenderDrawColor(ren_main, 0x00, 0x00, 0xff, 0xff);
-		SDL_RenderDrawRect(ren_main, &shape_rect1);
-	
-		SDL_SetRenderDrawColor(ren_main, 0xff, 0x00, 0x00, 0xff);
-		SDL_RenderDrawLine(ren_main, 0, i, win_w, i);
-		
-		SDL_SetRenderDrawColor(ren_main, 0x55, 0xaa, 0x55, 0xff);
-		unsigned short dot_line_x = (i * 2 < win_w)? (i * 2) : (i * 2) - win_w;
-		for(unsigned short j = 0; j < win_h; j += 10) {
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 1);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 3);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 5);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 6);
-		}
-		++dot_line_x;
-		SDL_SetRenderDrawColor(ren_main, 0x55, 0xaa, 0x55, 0xff);
-		for(unsigned short j = 0; j < win_h; j += 10) {
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 1);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 3);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 5);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 6);
-		}
-		++dot_line_x;
-		SDL_SetRenderDrawColor(ren_main, 0x55, 0xaa, 0x55, 0xff);
-		for(unsigned short j = 0; j < win_h; j += 10) {
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 1);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 3);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 5);
-			SDL_RenderDrawPoint(ren_main, dot_line_x, j + 6);
-		}
-		
-		SDL_RenderPresent(ren_main);
-		SDL_Delay(3);
-	}
-	
-	
-	SDL_RenderPresent(ren_main);
-	
-	SDL_Delay(200);
+	outro(ren_main, win_w, win_h);
 	
 	close(win_main, ren_main);
 	return 0;
@@ -228,4 +174,63 @@ SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren)
 	SDL_FreeSurface(tmp_surf);
 	
 	return tex;
+}
+
+void outro(SDL_Renderer* _ren, const int& _win_w, const int& _win_h)
+{
+	//clear screen, copy texture on, refresh (present)
+	//TODO decide if there should be an exit animaiton, make a proper one if yes
+	for(unsigned short i = 0; i < _win_h; ++i) {
+		SDL_SetRenderDrawColor(_ren, 0xff, 0xff, 0xff, 0xff);
+		SDL_RenderClear(_ren);
+		//SDL_RenderCopy(_ren, texs[srf_action_x], NULL, NULL);
+		
+		//draw primitives
+		SDL_Rect shape_rect0 = {i, (_win_h / 2) + 20, _win_w / 10, _win_h / 10};
+		SDL_Rect shape_rect1 = {_win_w - i, (_win_h / 2) - 20, 
+		                        (_win_w / 2) - i, (_win_h / 2) - i};
+		SDL_SetRenderDrawColor(_ren, 0xcc, 0xcc, 0xff, 0xff);
+		SDL_RenderFillRect(_ren, &shape_rect0);
+		
+		SDL_SetRenderDrawColor(_ren, 0x00, 0x00, 0xff, 0xff);
+		SDL_RenderDrawRect(_ren, &shape_rect1);
+	
+		SDL_SetRenderDrawColor(_ren, 0xff, 0x00, 0x00, 0xff);
+		SDL_RenderDrawLine(_ren, 0, i, _win_w, i);
+		
+		//draw wide dashed line
+		SDL_SetRenderDrawColor(_ren, 0x55, 0xaa, 0x55, 0xff);
+		unsigned short dot_line_x = (i * 2 < _win_w)? (i * 2) : (i * 2) - _win_w;
+		for(unsigned short j = 0; j < _win_h; j += 10) {
+			SDL_RenderDrawPoint(_ren, dot_line_x, j);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 1);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 3);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 5);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 6);
+		}
+		++dot_line_x;
+		SDL_SetRenderDrawColor(_ren, 0x55, 0xaa, 0x55, 0xff);
+		for(unsigned short j = 0; j < _win_h; j += 10) {
+			SDL_RenderDrawPoint(_ren, dot_line_x, j);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 1);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 3);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 5);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 6);
+		}
+		++dot_line_x;
+		SDL_SetRenderDrawColor(_ren, 0x55, 0xaa, 0x55, 0xff);
+		for(unsigned short j = 0; j < _win_h; j += 10) {
+			SDL_RenderDrawPoint(_ren, dot_line_x, j);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 1);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 3);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 5);
+			SDL_RenderDrawPoint(_ren, dot_line_x, j + 6);
+		}
+		
+		SDL_RenderPresent(_ren);
+		SDL_Delay(3);
+	}
+	
+	SDL_RenderPresent(_ren);
+	SDL_Delay(200);	
 }
