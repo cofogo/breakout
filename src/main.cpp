@@ -19,7 +19,7 @@ const int win_h = 640;
 
 int init(); //initialise SDL
 int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
-										const int _w, const int _h);
+                    const int _w, const int _h);
 int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
 void close(SDL_Window*& _win, SDL_Renderer*& _ren);
 SDL_Surface* load_surface(const string& _path);
