@@ -12,18 +12,20 @@ using std::string;
 #include <SDL2/SDL_image.h>
 
 #include "Paddle.h"
+#include "Timer.h"
 
 const int win_w = 800;
 const int win_h = 640;
 
 int init(); //initialise SDL
 int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
-										const int& _w, const int& _h);
+										const int _w, const int _h);
 int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
 void close(SDL_Window*& _win, SDL_Renderer*& _ren);
 SDL_Surface* load_surface(const string& _path);
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren);
-void outro(SDL_Renderer* _ren, const int& _win_w, const int& _win_h);
+void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h);
+void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 
 int main(int argc, char* args[])
 {
@@ -46,30 +48,7 @@ int main(int argc, char* args[])
 		return 1;
 	}
 	
-	//TODO move game logic out of main
-	Paddle paddle0(300, 550);
-	paddle0.assign_texture(load_texture("assets/gfx/paddle.png", ren_main));
-	if(paddle0.get_texture() == 0) cout << "WARNING: paddle texture NULL!\n";
-	
-	//main loop
-	bool flag_quit = false;
-	SDL_SetRenderDrawColor(ren_main, 0x00, 0x20, 0x20, 0xff);
-	while(flag_quit == false) {
-		SDL_Surface* srf_current = NULL;
-		SDL_Event event;
-		while(SDL_PollEvent(&event) != 0) {
-			if(event.type == SDL_QUIT) {
-				flag_quit = true;
-			}
-			
-			//render sequence
-			SDL_RenderClear(ren_main);
-			
-			paddle0.render(ren_main);
-			
-			SDL_RenderPresent(ren_main);
-		}
-	}
+	run_game(ren_main, win_w, win_h);
 	
 	outro(ren_main, win_w, win_h);
 	
@@ -96,7 +75,7 @@ int init()
 }
 
 int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
-										const int& _w, const int& _h)
+										const int _w, const int _h)
 {
 	_win = SDL_CreateWindow("hello SDL",
 														SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -176,7 +155,57 @@ SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren)
 	return tex;
 }
 
-void outro(SDL_Renderer* _ren, const int& _win_w, const int& _win_h)
+void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
+{
+	//init game
+	Timer loop_timer;
+	const short fps = 60;
+	Uint32 tgt_frame_len = 1000 / fps;
+	
+	Paddle paddle0(300, 550);
+	paddle0.assign_texture(load_texture("assets/gfx/paddle.png", _ren));
+	if(paddle0.get_texture() == NULL) {
+		cout << "WARNING: paddle texture NULL!\n";
+		return;
+	}
+	
+	int paddle_spd = 7;
+	
+	//main loop
+	bool flag_quit = false;
+	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
+	while(flag_quit == false) {
+		loop_timer.set_start(SDL_GetTicks());
+		SDL_Event event;
+		while(SDL_PollEvent(&event) != 0) {
+			if(event.type == SDL_QUIT) {
+				flag_quit = true;
+			}
+		}
+		
+		const Uint8* key_states = SDL_GetKeyboardState(NULL);
+		if(key_states[SDL_SCANCODE_LEFT]) {
+			paddle0.move_l(paddle_spd);
+		}
+		else if(key_states[SDL_SCANCODE_RIGHT]) {
+			paddle0.move_r(paddle_spd);
+		}
+		
+		loop_timer.set_end(SDL_GetTicks());
+		Uint32 wait_len = tgt_frame_len - loop_timer.get_duration();
+		if(wait_len > 0) {
+			SDL_Delay(wait_len);
+		}
+		//render sequence
+		SDL_RenderClear(_ren);
+		
+		paddle0.render(_ren);
+		
+		SDL_RenderPresent(_ren);
+	}
+}
+
+void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 {
 	//clear screen, copy texture on, refresh (present)
 	//TODO decide if there should be an exit animaiton, make a proper one if yes

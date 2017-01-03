@@ -34,3 +34,13 @@ void Paddle::render(SDL_Renderer* _ren)
 {
 	SDL_RenderCopy(_ren, m_texture, NULL, &m_rect);
 }
+
+void Paddle::move_l(const int _amt)
+{
+	m_rect.x -= _amt;
+}
+
+void Paddle::move_r(const int _amt)
+{
+	m_rect.x += _amt;
+}

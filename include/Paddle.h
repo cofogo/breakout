@@ -13,6 +13,8 @@ public:
 	void assign_texture(SDL_Texture* _tex);
 	SDL_Texture* get_texture();
 	void render(SDL_Renderer* _ren);
+	void move_l(const int _amt);
+	void move_r(const int _amt);
 	
 private:
 	SDL_Texture* m_texture;

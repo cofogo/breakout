@@ -5,3 +5,10 @@ limit the framerate properly and tidy up the code.
 Session time: 02:01:23
 Project time: 0d. 02:01:23
 
+[NEW SESSION] : 2017-01-03[11:59:38]Tuesday
+[11:59:47] Iplemented outro as a proper function.
+[14:44:42] implemented paddle movement and clamped FPS at 60.
+[END OF SESSION] : 2017-01-03[14:45:34]Tuesday
+Session time: 03:15:56
+Project time: 0d. 05:17:19
+
