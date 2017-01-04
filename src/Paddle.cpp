@@ -1,46 +1,26 @@
 #include "Paddle.h"
 
-Paddle::Paddle(int _x, int _y)
+// Paddle::Paddle(const int _x, const int _y, const int _s)
+Paddle::Paddle(SDL_Rect _rect, const int _s)
+: Object(_rect), m_speed(_s)
 {
-	m_rect.x = _x;
-	m_rect.y = _y;
-	m_rect.w = 0;
-	m_rect.h = 0;
 }
 
 Paddle::~Paddle()
 {
-	SDL_DestroyTexture(m_texture);
-	m_texture = NULL;
 }
 
-void Paddle::assign_texture(SDL_Texture* _tex)
+void Paddle::move_l()
 {
-	m_texture = _tex;
-	
-	int tex_w, tex_h;
-	SDL_QueryTexture(m_texture, NULL, NULL, &tex_w, &tex_h);
-	
-	m_rect.w = tex_w;
-	m_rect.h = tex_h;
+	m_rect.x -= m_speed;
 }
 
-SDL_Texture* Paddle::get_texture()
+void Paddle::move_r()
 {
-	return m_texture;
+	m_rect.x += m_speed;
 }
 
-void Paddle::render(SDL_Renderer* _ren)
+void Paddle::set_speed(const int _amt)
 {
-	SDL_RenderCopy(_ren, m_texture, NULL, &m_rect);
-}
-
-void Paddle::move_l(const int _amt)
-{
-	m_rect.x -= _amt;
-}
-
-void Paddle::move_r(const int _amt)
-{
-	m_rect.x += _amt;
+	m_speed = _amt;
 }

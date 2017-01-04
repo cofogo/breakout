@@ -7,12 +7,15 @@ using std::endl;
 using std::vector;
 #include <string>
 using std::string;
+#include <memory>
+using std::unique_ptr;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-#include "Paddle.h"
 #include "Timer.h"
+#include "Paddle.h"
+#include "Brick.h"
 
 const int win_w = 800;
 const int win_h = 640;
@@ -162,20 +165,37 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	const short fps = 60;
 	Uint32 tgt_frame_len = 1000 / fps;
 	
-	Paddle paddle0(300, 550);
-	paddle0.assign_texture(load_texture("assets/gfx/paddle.png", _ren));
-	if(paddle0.get_texture() == NULL) {
-		cout << "WARNING: paddle texture NULL!\n";
-		return;
+	Paddle paddle0(SDL_Rect{300, 600}, 7);
+	vector<unique_ptr<Brick>> bricks;
+	for(unsigned short i = 0; i < 12; ++i) {
+		for(unsigned short j = 0; j < 5; ++j) {
+			int x = 20 + (i * 60);
+			int y = 20 + (j * 30);
+			bricks.push_back(unique_ptr<Brick> (new Brick(SDL_Rect{x, y})));
+		}
 	}
 	
-	int paddle_spd = 7;
+	try {
+		SDL_Texture* tmp_tex = load_texture("assets/gfx/paddle.png", _ren);
+		paddle0.assign_texture(tmp_tex);
+		
+		tmp_tex = load_texture("assets/gfx/brick.png", _ren);
+		for(unsigned short i = 0; i < bricks.size(); ++i) {
+			bricks[i]->assign_texture(tmp_tex);
+		}
+	}
+	catch (const char* err_msg){
+		cerr << err_msg << endl;
+		cerr << "The program will now quit.\n";
+		return;
+	}
 	
 	//main loop
 	bool flag_quit = false;
 	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
 	while(flag_quit == false) {
 		loop_timer.set_start(SDL_GetTicks());
+		
 		SDL_Event event;
 		while(SDL_PollEvent(&event) != 0) {
 			if(event.type == SDL_QUIT) {
@@ -185,10 +205,10 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 		
 		const Uint8* key_states = SDL_GetKeyboardState(NULL);
 		if(key_states[SDL_SCANCODE_LEFT]) {
-			paddle0.move_l(paddle_spd);
+			paddle0.move_l();
 		}
 		else if(key_states[SDL_SCANCODE_RIGHT]) {
-			paddle0.move_r(paddle_spd);
+			paddle0.move_r();
 		}
 		
 		loop_timer.set_end(SDL_GetTicks());
@@ -196,10 +216,14 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 		if(wait_len > 0) {
 			SDL_Delay(wait_len);
 		}
+		
 		//render sequence
 		SDL_RenderClear(_ren);
 		
 		paddle0.render(_ren);
+		for(unsigned short i = 0; i < bricks.size(); ++i) {
+			bricks[i]->render(_ren);
+		}
 		
 		SDL_RenderPresent(_ren);
 	}

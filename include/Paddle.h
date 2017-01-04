@@ -4,21 +4,21 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
-class Paddle
+#include "Object.h"
+
+class Paddle: public Object
 {
 public:
-	Paddle(int _x, int _y);
+// 	Paddle(const int _x, const int _y, const int _s);
+	Paddle(SDL_Rect _rect, const int _s);
 	~Paddle();
 	
-	void assign_texture(SDL_Texture* _tex);
-	SDL_Texture* get_texture();
-	void render(SDL_Renderer* _ren);
-	void move_l(const int _amt);
-	void move_r(const int _amt);
+	void move_l();
+	void move_r();
+	void set_speed(const int _amt);
 	
 private:
-	SDL_Texture* m_texture;
-	SDL_Rect m_rect;
+	int m_speed;
 };
 
 #endif //PADDLE_H
