@@ -69,7 +69,7 @@ int init()
 	
 	int sdl_image_flags = IMG_INIT_PNG;
 	if(!(IMG_Init(sdl_image_flags) & sdl_image_flags)) {
-		cout << "ERROR: FATAL - could not initialise SDL_image!\n";
+		cerr << "ERROR: FATAL - could not initialise SDL_image!\n";
 		cerr << "SDL error = " << IMG_GetError() << endl;
 		return 1;
 	}
@@ -80,10 +80,10 @@ int init()
 int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
 										const int _w, const int _h)
 {
-	_win = SDL_CreateWindow("hello SDL",
-														SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-														_w, _h,
-														SDL_WINDOW_SHOWN);
+	_win = SDL_CreateWindow("breakout42",
+	                        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+	                        _w, _h,
+	                         SDL_WINDOW_SHOWN);
 	if(_win == NULL) {
 		cerr << "ERROR: FATAL - SDL window could not be created!\n";
 		cerr << "SDL error = " << SDL_GetError() << endl;
