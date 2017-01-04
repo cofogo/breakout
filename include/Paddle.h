@@ -9,7 +9,6 @@
 class Paddle: public Object
 {
 public:
-// 	Paddle(const int _x, const int _y, const int _s);
 	Paddle(SDL_Rect _rect, const int _s);
 	~Paddle();
 	
