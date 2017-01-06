@@ -27,3 +27,11 @@ Project time: 0d. 09:45:52
 Session time: 01:39:07
 Project time: 0d. 11:24:59
 
+[NEW SESSION] : 2017-01-06[14:11:58]Friday
+[14:12:17] Implemented ball, calculating directional speed by bounce angle.
+Prety neat, but will gave to use floating point, as now some speed is lost due
+to precision (full pixels only).
+[END OF SESSION] : 2017-01-06[14:14:31]Friday
+Session time: 01:02:33
+Project time: 0d. 12:27:32
+
