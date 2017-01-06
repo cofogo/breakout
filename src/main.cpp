@@ -15,6 +15,7 @@ using std::unique_ptr;
 
 #include "Timer.h"
 #include "Paddle.h"
+#include "Ball.h"
 #include "Brick.h"
 
 const int win_w = 800;
@@ -166,6 +167,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	Uint32 tgt_frame_len = 1000 / fps;
 	
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
+	Ball ball(SDL_Rect{300, 400}, 10, 45);
 	vector<unique_ptr<Brick>> bricks;
 	for(unsigned short i = 0; i < 12; ++i) {
 		for(unsigned short j = 0; j < 5; ++j) {
@@ -178,6 +180,9 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	try {
 		SDL_Texture* tmp_tex = load_texture("assets/gfx/paddle.png", _ren);
 		paddle0.assign_texture(tmp_tex);
+		
+		tmp_tex = load_texture("assets/gfx/ball.png", _ren);
+		ball.assign_texture(tmp_tex);
 		
 		tmp_tex = load_texture("assets/gfx/brick.png", _ren);
 		for(unsigned short i = 0; i < bricks.size(); ++i) {
@@ -203,6 +208,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 			}
 		}
 		
+		//input and update
 		const Uint8* key_states = SDL_GetKeyboardState(NULL);
 		if(key_states[SDL_SCANCODE_LEFT]) {
 			paddle0.move_l();
@@ -211,16 +217,18 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 			paddle0.move_r();
 		}
 		
+		ball.move(win_w, win_h);
+		
+		//render sequence
 		loop_timer.set_end(SDL_GetTicks());
 		Uint32 wait_len = tgt_frame_len - loop_timer.get_duration();
 		if(wait_len > 0) {
 			SDL_Delay(wait_len);
 		}
-		
-		//render sequence
 		SDL_RenderClear(_ren);
 		
 		paddle0.render(_ren);
+		ball.render(_ren);
 		for(unsigned short i = 0; i < bricks.size(); ++i) {
 			bricks[i]->render(_ren);
 		}
