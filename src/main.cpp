@@ -167,7 +167,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	Uint32 tgt_frame_len = 1000 / fps;
 	
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
-	Ball ball(SDL_Rect{300, 400}, 10, 45);
+	Ball ball(SDL_Rect{400, 300}, 9, 45);
 	vector<unique_ptr<Brick>> bricks;
 	for(unsigned short i = 0; i < 12; ++i) {
 		for(unsigned short j = 0; j < 5; ++j) {

@@ -35,3 +35,11 @@ to precision (full pixels only).
 Session time: 01:02:33
 Project time: 0d. 12:27:32
 
+[NEW SESSION] : 2017-01-07[10:25:19]Saturday
+
+[13:02:06] migrated ball speed and coordinate calculations from integral to floa
+ting-point calculations.
+[END OF SESSION] : 2017-01-07[13:04:32]Saturday
+Session time: 02:39:13
+Project time: 0d. 15:06:45
+

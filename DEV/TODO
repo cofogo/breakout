@@ -1,27 +1,28 @@
-consider an xmind project
-
 TODO - backlog
 ==============
-- [ ] implement the brick array
 - [ ] implement the second paddle
-- [ ] implement the ball(s)
-- [ ] implement ball recoil angle dependancy on paddle impact location distance from paddle centre
 
 TODO - cofogo
 =============
-- [ ] create a worktime log for the project
+- [x] create a worktime log for the project
+- [x] implement paddle movement
 - [x] create the paddle graphic
-- [ ] make a class to wrap textures in
-    - [ ] memory alloc/free
-    - [ ] rendering handling
-    - [ ] collision handling
-    - [ ] colour keying
-    - [ ] alpha blending
+- [x] implement the brick array
+- [x] implement the ball(s)
+- [ ] rectangular collision handling
+- [ ] implement ball recoil angle dependancy on paddle impact location distance from paddle centre
+    - [x] ball speed calculations based on angle
+    - [ ]
+- [ ] make a class to wrap scene object textures in (object.h)
+    - [x] memory alloc/free
+    - [x] rendering handling
+    - [ ] rectangular collision handling
+    - [ ] colour keying or alpha blending
     - [ ] colour modulation
-- [ ] consider alternatives to a custom container for loaded texture handling
-- [ ] impelement fps rate limit (60fps)
+- [x] impelement fps rate limit (60fps)
 - [ ] find a way to display fps without hogging a lot of compute time
 
 TODO - luke1222
 ===============
-- [ ] implement paddle movement
+- [ ] allign the brick aray to centre of scene
+- [ ] stop paddle from moving outside the edges of the scene
