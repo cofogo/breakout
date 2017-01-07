@@ -13,7 +13,6 @@ Session time: 03:15:56
 Project time: 0d. 05:17:19
 
 [NEW SESSION] : 2017-01-04[07:21:50]Wednesday
-
 [11:48:05] improved code structure and optimised a bit.
 - Implemented the brick object and got some bricks to render.
 - Created some placeholder graphics for bricks and balls.
@@ -36,7 +35,6 @@ Session time: 01:02:33
 Project time: 0d. 12:27:32
 
 [NEW SESSION] : 2017-01-07[10:25:19]Saturday
-
 [13:02:06] migrated ball speed and coordinate calculations from integral to floa
 ting-point calculations.
 [END OF SESSION] : 2017-01-07[13:04:32]Saturday
