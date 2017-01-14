@@ -217,7 +217,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 			paddle0.move_r();
 		}
 		
-		ball.move(win_w, win_h);
+		ball.move(win_w, win_h, &bricks);
 		
 		//render sequence
 		loop_timer.set_end(SDL_GetTicks());

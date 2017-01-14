@@ -16,6 +16,7 @@ public:
 	int assign_texture(SDL_Texture* _tex);
 	SDL_Texture* get_texture();
 	void render(SDL_Renderer* _ren);
+	SDL_Rect* get_rect();
 	
 protected:
 	SDL_Rect m_rect;

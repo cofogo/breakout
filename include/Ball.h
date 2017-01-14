@@ -2,11 +2,16 @@
 #define BALL_H
 
 #include <cmath>
+#include <vector>
+using std::vector;
+#include <memory>
+using std::unique_ptr;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 
 #include "Object.h"
+#include "Brick.h"
 
 class Ball: public Object
 {
@@ -14,7 +19,7 @@ public:
 	Ball(SDL_Rect _rect, short _spd, short _angle);
 	~Ball();
 	
-	void move(short _x_max, short _y_max);
+	void move(short _x_max, short _y_max, vector<unique_ptr<Brick>>* _obsts);
 	void change_dir(short _angle);
 	
 private:
