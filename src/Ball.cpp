@@ -69,26 +69,43 @@ void Ball::change_dir(short _angle)
 
 void Ball::move(short _x_max, short _y_max, vector<unique_ptr<Brick>>* _obsts)
 {
+	int left = this->m_rect.x;
+	int right = this->m_rect.x + this->m_rect.w;
+	int top = this->m_rect.y;
+	int bot = this->m_rect.y + this->m_rect.h;
+	
 	// checking bounds
-	if(m_rect.x + m_rect.w + m_x_speed > _x_max
-	|| m_rect.x + m_x_speed < 0) {
+	if(right + m_x_speed > _x_max || left + m_x_speed < 0) {
 		m_x_speed = -m_x_speed;
 	}
-	if(m_rect.y + m_rect.h + m_y_speed > _y_max || m_rect.y + m_y_speed < 0) {
+	if(bot + m_y_speed > _y_max || top + m_y_speed < 0) {
 		m_y_speed = -m_y_speed;
 	}
 	
-	//
+	//check for and handle collisions
 	for(unsigned i = 0; i < _obsts->size(); ++i) {
-		if(m_rect.x > (*_obsts)[i]->get_rect()->x + (*_obsts)[i]->get_rect()->w
-		|| m_rect.x + m_rect.w < (*_obsts)[i]->get_rect()->x
-		|| m_rect.y > (*_obsts)[i]->get_rect()->y + (*_obsts)[i]->get_rect()->h
-		|| m_rect.y + m_rect.h < (*_obsts)[i]->get_rect()->y
+		int obst_left = (*_obsts)[i]->get_rect()->x;
+		int obst_right = (*_obsts)[i]->get_rect()->x
+		              + (*_obsts)[i]->get_rect()->w;
+		int obst_top = (*_obsts)[i]->get_rect()->y;
+		int obst_bot = (*_obsts)[i]->get_rect()->y
+		             + (*_obsts)[i]->get_rect()->h;
+		if(left > obst_right
+		|| right < obst_left
+		|| top > obst_bot
+		|| bot < obst_top
 		) { // no collision
 		}
 		else {
 			//collision - have to find direction change
 			cerr << "Collision!\n";
+			//FIXME - solution looks fun, but does not work as intended xD
+			if(abs(top - obst_top) < abs(left - obst_left)) {
+				m_x_speed = -m_x_speed;
+			}
+			else {
+				m_y_speed = -m_y_speed;
+			}
 			break;
 		}
 	}
