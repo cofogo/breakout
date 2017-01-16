@@ -8,7 +8,7 @@ using std::vector;
 #include <string>
 using std::string;
 #include <memory>
-using std::unique_ptr;
+using std::shared_ptr;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -168,12 +168,12 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
 	Ball ball(SDL_Rect{400, 300}, 9, 45);
-	vector<unique_ptr<Brick>> bricks;
-	for(unsigned short i = 0; i < 12; ++i) {
+	vector<shared_ptr<Brick>> bricks;
+	for(unsigned short i = 0; i < 10; ++i) {
 		for(unsigned short j = 0; j < 5; ++j) {
 			int x = 20 + (i * 60);
 			int y = 20 + (j * 30);
-			bricks.push_back(unique_ptr<Brick> (new Brick(SDL_Rect{x, y})));
+			bricks.push_back(shared_ptr<Brick> (new Brick(SDL_Rect{x, y})));
 		}
 	}
 	

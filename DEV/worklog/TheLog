@@ -51,3 +51,22 @@ te.
 Session time: 09:43:01
 Project time: 1d. 00:49:46
 
+[NEW SESSION] : 2017-01-16[21:52:11]Monday
+[21:52:36] One of the dirtiest code examples was produced today... It kind-of
+works, but just as a place-holder.
+--- TODO - Remove dirty code ---
+- FIX ball class so internal functions only do what they are supposed to do.
+- FIX texture handling, so that they can be shared.
+- FIX collision detection logic, to also handle the paddle.
+[END OF SESSION] : 2017-01-16[21:58:31]Monday
+Session time: 02:36:20
+Project time: 1d. 03:26:06
+
+[NEW SESSION] : 2017-01-16[22:03:10]Monday
+[22:03:12] On the up side though, we have a ball that
+handles collisions correctly ~90 percent of the time.
+And bricks do get destroyed when hit by the ball.
+[END OF SESSION] : 2017-01-16[22:05:41]Monday
+Session time: 00:02:31
+Project time: 1d. 03:28:37
+

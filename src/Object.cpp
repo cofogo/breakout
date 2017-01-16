@@ -8,10 +8,12 @@ Object::Object(SDL_Rect _rect)
 
 Object::~Object()
 {
-	if(m_texture != NULL) {
+	/*TODO move the texture destruction outside the object or come up
+	with some intelligent way to share the texture between multiple objects*/
+	/*if(m_texture != NULL) {
 		SDL_DestroyTexture(m_texture);
 		m_texture = NULL;
-	}
+	}*/
 }
 
 int Object::assign_texture(SDL_Texture* _tex)
