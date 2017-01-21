@@ -67,7 +67,7 @@ void Ball::change_dir(short _angle)
 	cerr << "ball_y: " << m_real_y << endl;
 }
 
-void Ball::move(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
+void Ball::update(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
 {
 	int left = m_rect.x + m_dx;
 	int right = m_rect.x + m_rect.w + m_dx;
@@ -92,10 +92,6 @@ void Ball::move(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
 		int obst_top = (*_obsts)[i]->get_rect()->y;
 		int obst_bot = (*_obsts)[i]->get_rect()->y
 		             + (*_obsts)[i]->get_rect()->h;
-		/*int obst_cen_x = (*_obsts)[i]->get_rect()->x
-					   + ((*_obsts)[i]->get_rect()->w / 2);
-		int obst_cen_y = (*_obsts)[i]->get_rect()->y
-					   + ((*_obsts)[i]->get_rect()->h / 2);*/
 		if(left > obst_right
 		|| right < obst_left
 		|| top > obst_bot
@@ -115,18 +111,6 @@ void Ball::move(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
 			else {
 				m_dx *= -1;
 			}
-			//FIXME - solution looks fun, but does not work as intended xD
-			/*if(abs(top - obst_top) < abs(left - obst_left)) {
-				m_dy = -m_dy;
-			}
-			else if(abs(top - obst_top) > abs(left - obst_left)) {
-				m_dx = -m_dx;
-			}
-			else {
-				m_dx = -m_dx;
-				m_dy = -m_dy;
-			}
-			break;*/
 		}
 	}
 
