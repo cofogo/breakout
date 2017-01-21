@@ -16,7 +16,7 @@ Object::~Object()
 	}*/
 }
 
-int Object::assign_texture(SDL_Texture* _tex)
+int Object::assign_texture(shared_ptr<SDL_Texture> _tex)
 {
 	if(_tex == NULL) {
 		throw "ERROR: Null texture assignment.";
@@ -25,7 +25,7 @@ int Object::assign_texture(SDL_Texture* _tex)
 	m_texture = _tex;
 	
 	int tex_w, tex_h;
-	SDL_QueryTexture(m_texture, NULL, NULL, &tex_w, &tex_h);
+	SDL_QueryTexture(m_texture.get(), NULL, NULL, &tex_w, &tex_h);
 	
 	m_rect.w = tex_w;
 	m_rect.h = tex_h;
@@ -35,7 +35,7 @@ int Object::assign_texture(SDL_Texture* _tex)
 
 void Object::render(SDL_Renderer* _ren)
 {
-	SDL_RenderCopy(_ren, m_texture, NULL, &m_rect);
+	SDL_RenderCopy(_ren, m_texture.get(), NULL, &m_rect);
 }
 
 SDL_Rect* Object::get_rect()

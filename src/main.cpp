@@ -28,7 +28,9 @@ int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
 void close(SDL_Window*& _win, SDL_Renderer*& _ren);
 SDL_Surface* load_surface(const string& _path);
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren);
-void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h);
+vector<shared_ptr<SDL_Texture>>* load_textures(SDL_Renderer* _ren);
+void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
+              vector<shared_ptr<SDL_Texture>>* _texs);
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 
 int main(int argc, char* args[])
@@ -52,7 +54,14 @@ int main(int argc, char* args[])
 		return 1;
 	}
 	
-	run_game(ren_main, win_w, win_h);
+	vector<shared_ptr<SDL_Texture>>* texs = load_textures(ren_main);
+	if(texs == NULL) {
+		return 1;
+	}
+	
+	run_game(ren_main, win_w, win_h, texs);
+    /* NOTE - move mem deallocation to separate functon if there will be more
+	objects in the future */
 	
 	outro(ren_main, win_w, win_h);
 	
@@ -159,7 +168,8 @@ SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren)
 	return tex;
 }
 
-void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
+void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
+              vector<shared_ptr<SDL_Texture>>* _texs)
 {
 	//init game
 	Timer loop_timer;
@@ -177,22 +187,11 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 		}
 	}
 	
-	try {
-		SDL_Texture* tmp_tex = load_texture("assets/gfx/paddle.png", _ren);
-		paddle0.assign_texture(tmp_tex);
-		
-		tmp_tex = load_texture("assets/gfx/ball.png", _ren);
-		ball.assign_texture(tmp_tex);
-		
-		tmp_tex = load_texture("assets/gfx/brick.png", _ren);
-		for(unsigned short i = 0; i < bricks.size(); ++i) {
-			bricks[i]->assign_texture(tmp_tex);
-		}
-	}
-	catch (const char* err_msg){
-		cerr << err_msg << endl;
-		cerr << "The program will now quit.\n";
-		return;
+	paddle0.assign_texture((*_texs)[0]);
+	ball.assign_texture((*_texs)[1]);
+
+	for(unsigned short i = 0; i < bricks.size(); ++i) {
+		bricks[i]->assign_texture((*_texs)[2]);
 	}
 	
 	//main loop
@@ -294,4 +293,31 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	
 	SDL_RenderPresent(_ren);
 	SDL_Delay(200);	
+}
+
+vector<shared_ptr<SDL_Texture>>* load_textures(SDL_Renderer* _ren) {
+	vector<shared_ptr<SDL_Texture>>* texs = new vector<shared_ptr<SDL_Texture>>;
+	try {
+		//0
+		SDL_Texture* tex = load_texture("assets/gfx/paddle.png", _ren);
+		shared_ptr<SDL_Texture> shared_tex;
+		shared_tex.reset(tex, SDL_DestroyTexture);
+		texs->push_back(std::move(shared_tex));
+		//1
+		tex = load_texture("assets/gfx/ball.png", _ren);
+		shared_tex.reset(tex, SDL_DestroyTexture);
+		texs->push_back(shared_tex);
+		//2
+		tex = load_texture("assets/gfx/brick.png", _ren);
+		shared_tex.reset(tex, SDL_DestroyTexture);
+		texs->push_back(shared_tex);
+	}
+	catch(const char* err_msg) {
+		cerr << err_msg << endl;
+		cerr << "The program will now quit.\n";
+		
+		return NULL;
+	}
+	
+	return texs;
 }

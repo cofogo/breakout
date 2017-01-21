@@ -70,3 +70,24 @@ And bricks do get destroyed when hit by the ball.
 Session time: 00:02:31
 Project time: 1d. 03:28:37
 
+[NEW SESSION] : 2017-01-19[08:13:19]Thursday
+[08:13:49] Spent a couple of hours designing and implementing texture sharing. S
+till a little bit to go.
+[END OF SESSION] : 2017-01-19[08:15:07]Thursday
+Session time: 02:01:48
+Project time: 1d. 05:30:25
+
+[NEW SESSION] : 2017-01-20[08:05:10]Friday
+[08:05:23] got stuck implementing shared textures... learning about smart
+pointers and writing code that segfaults on vector.push_back() xD
+[END OF SESSION] : 2017-01-20[08:07:11]Friday
+Session time: 01:32:01
+Project time: 1d. 07:02:26
+
+[NEW SESSION] : 2017-01-21[13:47:53]Saturday
+[13:48:00] Fixed one of the dumbest errors I have ever made, and thus done
+implementing the shared texture handling system.
+[END OF SESSION] : 2017-01-21[13:49:52]Saturday
+Session time: 02:01:59
+Project time: 1d. 09:04:25
+
