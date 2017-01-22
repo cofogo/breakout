@@ -1,5 +1,5 @@
-TODO - backlog
-==============
+BACKLOG
+=======
 - [ ] implement the second paddle
 
 TODO - cofogo
@@ -9,18 +9,18 @@ TODO - cofogo
 - [x] create the paddle graphic
 - [x] implement the brick array
 - [x] implement the ball(s)
-- [ ] rectangular collision handling
+- [x] rectangular collision handling
 - [ ] implement ball recoil angle dependancy on paddle impact location distance from paddle centre
-    - [x] ball speed calculations based on angle
-    - [ ]
-- [ ] make a class to wrap scene object textures in (object.h)
-    - [x] memory alloc/free
-    - [x] rendering handling
-    - [ ] rectangular collision handling
-    - [ ] colour keying or alpha blending
-    - [ ] colour modulation
+    - [x] ball speed calculations based on angle (maybe base on x offset rather that angle?)
+    - [ ] the actual collision detection and handling
+- [x] texture memory alloc/free
+- [x] rendering handling
+- [x] rectangular collision handling
+- [ ] colour keying or alpha blending
+- [ ] colour modulation
 - [x] impelement fps rate limit (60fps)
 - [ ] find a way to display fps without hogging a lot of compute time
+    - [ ] make fps display toggleable
 
 TODO - luke1222
 ===============
