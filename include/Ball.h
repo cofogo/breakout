@@ -19,7 +19,8 @@ public:
 	Ball(SDL_Rect _rect, short _spd, short _angle);
 	~Ball();
 	
-	void update(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts);
+	void update(short _x_max, short _y_max,
+	     vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r);
 	void change_dir(short _angle);
 private:
 	short m_total_speed;

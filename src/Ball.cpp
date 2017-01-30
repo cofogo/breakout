@@ -33,31 +33,23 @@ void Ball::change_dir(short _angle)
 	//calculating speed depending on which 90deg quarter the angle degree falls into
 	if(_angle >= 0 && _angle < 90) {
 		short local_angle = _angle;
-		double x_speed_margin = (double)(local_angle) / 90;
-		double y_speed_margin = -(double)(90 - local_angle) / 90;
-		m_dx = (double)(m_total_speed) * x_speed_margin;
-		m_dy = (double)(m_total_speed) * y_speed_margin;
+		m_dx = (double)(local_angle) / 90;
+		m_dy = -(double)(90 - local_angle) / 90;
 	}
 	else if(_angle >= 90 && _angle < 180) {
 		short local_angle = _angle - 90;
-		double x_speed_margin = (double)(90 - local_angle) / 90;
-		double y_speed_margin = (double)(local_angle) / 90;
-		m_dx = (double)(m_total_speed) * x_speed_margin;
-		m_dy = (double)(m_total_speed) * y_speed_margin;
+		m_dx = (double)(90 - local_angle) / 90;
+		m_dy = (double)(local_angle) / 90;
 	}
 	else if(_angle >= 180 && _angle < 270) {
 		short local_angle = _angle - 180;
-		double x_speed_margin = -(double)(local_angle) / 90;
-		double y_speed_margin = (double)(90 - local_angle) / 90;
-		m_dx = (double)(m_total_speed) * x_speed_margin;
-		m_dy = (double)(m_total_speed) * y_speed_margin;
+		m_dx = -(double)(local_angle) / 90;
+		m_dy = (double)(90 - local_angle) / 90;
 	}
 	else if(_angle >= 270 && _angle < 360) {
 		short local_angle = _angle - 270;
-		double x_speed_margin = -(double)(90 - local_angle) / 90;
-		double y_speed_margin = -(double)(local_angle) / 90;
-		m_dx = (double)(m_total_speed) * x_speed_margin;
-		m_dy = (double)(m_total_speed) * y_speed_margin;
+		m_dx = -(double)(90 - local_angle) / 90;
+		m_dy = -(double)(local_angle) / 90;
 	}
 	
 	cerr << "ball total speed: " << m_total_speed << endl;
@@ -67,7 +59,8 @@ void Ball::change_dir(short _angle)
 	cerr << "ball_y: " << m_real_y << endl;
 }
 
-void Ball::update(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
+void Ball::update(short _x_max, short _y_max,
+     vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r)
 {
 	int left = m_rect.x + m_dx;
 	int right = m_rect.x + m_rect.w + m_dx;
@@ -92,6 +85,7 @@ void Ball::update(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
 		int obst_top = (*_obsts)[i]->get_rect()->y;
 		int obst_bot = (*_obsts)[i]->get_rect()->y
 		             + (*_obsts)[i]->get_rect()->h;
+
 		if(left > obst_right
 		|| right < obst_left
 		|| top > obst_bot
@@ -105,17 +99,51 @@ void Ball::update(short _x_max, short _y_max, vector<shared_ptr<Brick>>* _obsts)
 			(*_obsts)[i] = _obsts->back();
 			(*_obsts).pop_back();
 			
+			//TODO - this logic is simplified, sometimes behaves counterintuitively
+			//polish laer
 			if(cen_y > obst_bot || cen_y < obst_top) {
 				m_dy *= -1;
 			}
 			else {
 				m_dx *= -1;
 			}
+
+			break;
 		}
+	}
+
+	//handle collision with the paddle
+	if(left > _paddle0_r->x + _paddle0_r->w
+	|| right < _paddle0_r->x
+	|| top > _paddle0_r->y + _paddle0_r->h
+	|| bot < _paddle0_r->y
+	) { // no collision
+	}
+	else {
+		//collision - have to find direction change
+		cerr << "Paddle collision!\n";
+		if(cen_y > _paddle0_r->y + _paddle0_r->h || cen_y < _paddle0_r->y) {
+			m_dy *= -1;
+			short pad0_cen_x = (_paddle0_r->x + _paddle0_r->w) / 2;
+			short pad0_hlength_x = pad0_cen_x - _paddle0_r->x;
+			double new_dx = (double)(cen_x - pad0_cen_x) / pad0_hlength_x;
+
+			if(new_dx > 0.9d) {new_dx = 0.9d;}
+			else if(new_dx < -0.9d) {new_dx == -0.9d;}
+
+			m_dx = new_dx;
+			m_dy = (m_dy > 0)? 1.0d - abs(new_dx) : -(1.0d - abs(new_dx));
+			cerr << "dx: " << m_dx << endl;
+			cerr << "dy: " << m_dy << endl;
+		}
+		else {
+			m_dx *= -1;
+		}
+		
 	}
 
 	//moving the ball
 	//NOTE a bit inefficient
-	m_rect.x = m_real_x += m_dx;
-	m_rect.y = m_real_y += m_dy;
+	m_rect.x = m_real_x += m_dx * m_total_speed;
+	m_rect.y = m_real_y += m_dy * m_total_speed;
 }

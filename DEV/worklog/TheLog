@@ -98,3 +98,11 @@ Project time: 1d. 09:04:25
 Session time: 01:28:14
 Project time: 1d. 10:32:39
 
+[NEW SESSION] : 2017-01-30[06:07:49]Monday
+[08:07:56] improved collision detection
+[08:08:16] implemented bounce off ange dependency based on paddle collision loca
+tion. But its bugged at the moment, no time to fix now - tomorrow maybe.
+[END OF SESSION] : 2017-01-30[08:10:29]Monday
+Session time: 02:02:40
+Project time: 1d. 12:35:19
+
