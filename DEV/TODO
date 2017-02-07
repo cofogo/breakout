@@ -1,6 +1,8 @@
 BACKLOG
 =======
 - [ ] implement the second paddle
+- [ ] change round loss condition to no balls left, to support multiple balls
+- [ ] implement last player hit tracking on ball (probs pass ID)
 
 TODO - cofogo
 =============
@@ -10,12 +12,16 @@ TODO - cofogo
 - [x] implement the brick array
 - [x] implement the ball(s)
 - [x] rectangular collision handling
-- [ ] implement ball recoil angle dependancy on paddle impact location distance from paddle centre
+- [x] implement ball recoil angle dependancy on paddle impact location distance from paddle centre
     - [x] ball speed calculations based on angle (maybe base on x offset rather that angle?)
-    - [ ] the actual collision detection and handling
+    - [x] the actual collision detection and handling
+    - [ ] BUG - fix the unexpected behaviour on collision with paddle
 - [x] texture memory alloc/free
 - [x] rendering handling
 - [x] rectangular collision handling
+- [ ] player livecount
+- [ ] score
+- [ ] game over
 - [ ] colour keying or alpha blending
 - [ ] colour modulation
 - [x] impelement fps rate limit (60fps)

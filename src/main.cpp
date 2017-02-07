@@ -32,6 +32,7 @@ vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren);
 void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
               vector<shared_ptr<SDL_Texture>>* _texs);
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
+int check_loss(SDL_Rect* _r, const int _max_h);
 
 int main(int argc, char* args[])
 {
@@ -215,7 +216,11 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		}
 		
 		ball.update(win_w, win_h, &bricks, paddle0.get_rect());
-		
+		if(check_loss(ball.get_rect(), win_h)) {
+			ball = Ball(SDL_Rect{400, 300}, 9, 45);
+			ball.assign_texture((*_texs)[1]);
+		}
+
 		//render sequence
 		loop_timer.set_end(SDL_GetTicks());
 		Uint32 wait_len = tgt_frame_len - loop_timer.get_duration();
@@ -318,4 +323,11 @@ vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren) {
 	}
 	
 	return texs;
+}
+
+int check_loss(SDL_Rect* _r, const int _max_y)
+{
+	if(_r->y > _max_y) {return 1;}
+
+	return 0;
 }

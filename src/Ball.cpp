@@ -68,15 +68,25 @@ void Ball::update(short _x_max, short _y_max,
 	int bot = m_rect.y + m_rect.h  + m_dy;
 	int cen_x = m_rect.x + (m_rect.w / 2);
 	int cen_y = m_rect.y + (m_rect.h / 2);
+
+	//in the future this flag will change depending on which player the ball
+	//belongs to
+	bool bott_death = true;	
 	
 	// checking bounds
 	if(right + m_dx > _x_max || left + m_dx < 0) {
 		m_dx = -m_dx;
 	}
-	if(bot + m_dy > _y_max || top + m_dy < 0) {
-		m_dy = -m_dy;
+	if(bott_death) {
+		if(top + m_dy < 0) {
+			m_dy = -m_dy;
+		}
 	}
-	
+	else {
+		if(bot + m_dy > _y_max) {
+			m_dy = -m_dy;
+		}
+	}
 	//check for and handle collisions
 	for(unsigned i = 0; i < _obsts->size(); ++i) {
 		int obst_left = (*_obsts)[i]->get_rect()->x;
