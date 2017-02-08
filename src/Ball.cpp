@@ -109,7 +109,7 @@ void Ball::update(short _x_max, short _y_max,
 			(*_obsts)[i] = _obsts->back();
 			(*_obsts).pop_back();
 			
-			//TODO - this logic is simplified, sometimes behaves counterintuitively
+			//TODO - this logic is simplified, sometimes misbehaves
 			//polish laer
 			if(cen_y > obst_bot || cen_y < obst_top) {
 				m_dy *= -1;
@@ -134,15 +134,15 @@ void Ball::update(short _x_max, short _y_max,
 		cerr << "Paddle collision!\n";
 		if(cen_y > _paddle0_r->y + _paddle0_r->h || cen_y < _paddle0_r->y) {
 			m_dy *= -1;
-			short pad0_cen_x = (_paddle0_r->x + _paddle0_r->w) / 2;
-			short pad0_hlength_x = pad0_cen_x - _paddle0_r->x;
-			double new_dx = (double)(cen_x - pad0_cen_x) / pad0_hlength_x;
-
+			short pad0_cen_x = (_paddle0_r->x + (_paddle0_r->w / 2));
+			double new_dx = (double)(cen_x - pad0_cen_x) / (_paddle0_r->w / 2);
+			cerr << "new_dx" << fabs(new_dx) << endl;
+			//clamp change range
 			if(new_dx > 0.9d) {new_dx = 0.9d;}
 			else if(new_dx < -0.9d) {new_dx == -0.9d;}
 
 			m_dx = new_dx;
-			m_dy = (m_dy > 0)? 1.0d - abs(new_dx) : -(1.0d - abs(new_dx));
+			m_dy = (m_dy > 0)? (1.0d - fabs(new_dx)) : (-1.0d + fabs(new_dx));
 			cerr << "dx: " << m_dx << endl;
 			cerr << "dy: " << m_dy << endl;
 		}
