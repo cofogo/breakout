@@ -31,3 +31,4 @@ breakout42
 
 # VIM swaps and backups
 .*.swp
+*~
