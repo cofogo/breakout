@@ -19,9 +19,13 @@ TODO - cofogo
 - [x] texture memory alloc/free
 - [x] rendering handling
 - [x] rectangular collision handling
-- [ ] player livecount
-- [ ] score
-- [ ] game over
+- [x] player livecount
+- [x] game over
+- [x] game won
+- [ ] gui text
+    - [ ] player live count
+    - [ ] score
+    - [ ] game won/over
 - [ ] colour keying or alpha blending
 - [ ] colour modulation
 - [x] impelement fps rate limit (60fps)

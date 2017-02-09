@@ -12,6 +12,7 @@ using std::shared_ptr;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 #include "Timer.h"
 #include "Paddle.h"
@@ -179,7 +180,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	Ball ball(SDL_Rect{400, 300}, 9, 45);
 	vector<shared_ptr<Brick>> bricks;
 	for(unsigned short i = 0; i < 10; ++i) {
-		for(unsigned short j = 0; j < 5; ++j) {
+		for(unsigned short j = 0; j < 1; ++j) {
 			int x = 20 + (i * 60);
 			int y = 20 + (j * 30);
 			bricks.push_back(shared_ptr<Brick> (new Brick(SDL_Rect{x, y})));
@@ -189,10 +190,12 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	paddle0.assign_texture((*_texs)[0]);
 	ball.assign_texture((*_texs)[1]);
 
+	unsigned short lives0 = 3;
+
 	for(unsigned short i = 0; i < bricks.size(); ++i) {
 		bricks[i]->assign_texture((*_texs)[2]);
 	}
-	
+
 	//main loop
 	bool flag_quit = false;
 	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
@@ -217,8 +220,21 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		
 		ball.update(win_w, win_h, &bricks, paddle0.get_rect());
 		if(check_loss(ball.get_rect(), win_h)) {
+			//if ball lost, decrement lives, end game if lives == 0
+			if(--lives0 == 0) {
+				flag_quit = true;
+				cout << "GAME OVER!\nTRY AGAIN ;)\n"; //TODO game over graphics
+				break;
+			}
+			cerr << "lives: " << lives0 << endl; //TODO print lives on GUI
 			ball = Ball(SDL_Rect{400, 300}, 9, 45);
 			ball.assign_texture((*_texs)[1]);
+		}
+
+		if(bricks.size() == 0) {
+			flag_quit = true;
+			cout << "YOU WIN!\n"; //TODO print on GUI
+			break;
 		}
 
 		//render sequence
