@@ -317,9 +317,10 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren) {
 	vector<shared_ptr<SDL_Texture>> texs;
 	try {
-		//0
-		SDL_Texture* tex = load_texture("assets/gfx/paddle.png", _ren);
 		shared_ptr<SDL_Texture> shared_tex;
+		SDL_Texture* tex;
+		//0
+		tex = load_texture("assets/gfx/paddle.png", _ren);
 		shared_tex.reset(tex, SDL_DestroyTexture);
 		texs.push_back(std::move(shared_tex));
 		//1
