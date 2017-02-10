@@ -34,6 +34,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
               vector<shared_ptr<SDL_Texture>>* _texs);
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 int check_loss(SDL_Rect* _r, const int _max_h);
+SDL_Texture* load_txt_texture(string _s, TTF_Font* _font, SDL_Colour _col,
+             SDL_Renderer* _ren);
 
 int main(int argc, char* args[])
 {
@@ -80,7 +82,13 @@ int init()
 	int sdl_image_flags = IMG_INIT_PNG;
 	if(!(IMG_Init(sdl_image_flags) & sdl_image_flags)) {
 		cerr << "ERROR: FATAL - could not initialise SDL_image!\n";
-		cerr << "SDL error = " << IMG_GetError() << endl;
+		cerr << "SDL_image error = " << IMG_GetError() << endl;
+		return 1;
+	}
+
+	if(TTF_Init() == -1) {
+		cerr << "ERROR: FATAL - could not initialise SDL_ttf!\n";
+		cerr << "SDL_ttf error = " << TTF_GetError() << endl;
 		return 1;
 	}
 	
@@ -196,6 +204,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		bricks[i]->assign_texture((*_texs)[2]);
 	}
 
+	TTF_Font* font0 = TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 28);
+
 	//main loop
 	bool flag_quit = false;
 	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
@@ -249,6 +259,12 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		ball.render(_ren);
 		for(unsigned short i = 0; i < bricks.size(); ++i) {
 			bricks[i]->render(_ren);
+		}
+
+		SDL_Colour txt_col0 = {40, 120, 160};
+		SDL_Texture* final_text_tex = load_txt_texture("YOU WIN", font0, txt_col0, _ren);//TODO ASAP implement properly, this is just proof of concept.
+		if(final_text_tex != NULL) {
+			SDL_RenderCopy(_ren, final_text_tex, NULL, NULL);
 		}
 		
 		SDL_RenderPresent(_ren);
@@ -347,4 +363,25 @@ int check_loss(SDL_Rect* _r, const int _max_y)
 	if(_r->y > _max_y) {return 1;}
 
 	return 0;
+}
+
+SDL_Texture* load_txt_texture(string _s, TTF_Font* _font, SDL_Colour _col,
+             SDL_Renderer* _ren) {
+	SDL_Surface* txt_surf = TTF_RenderText_Solid(_font, _s.c_str(), _col);
+	if(txt_surf == NULL) {
+		char msg[] = "unable to render text surface. SDL_ttd err = ";
+		cout << msg << TTF_GetError() << endl;
+		return NULL;
+	}
+
+	SDL_Texture* txt_tex = SDL_CreateTextureFromSurface(_ren, txt_surf);
+	if(txt_tex == NULL) {
+		char msg[] = "unable to create texture from rendered text. SDL2 err = ";
+		cout << msg << SDL_GetError() << endl;
+		return NULL;
+	}
+
+	SDL_FreeSurface(txt_surf); //don't need the surface any more
+
+	return txt_tex;
 }
