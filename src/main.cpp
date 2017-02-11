@@ -7,17 +7,20 @@ using std::endl;
 using std::vector;
 #include <string>
 using std::string;
+using std::to_string;
 #include <memory>
 using std::shared_ptr;
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-
+#include "utils.h"
 #include "Timer.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "Brick.h"
+#include "Text_Object.h"
+
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
 
 const int win_w = 800;
 const int win_h = 640;
@@ -34,8 +37,9 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
               vector<shared_ptr<SDL_Texture>>* _texs);
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 int check_loss(SDL_Rect* _r, const int _max_h);
-SDL_Texture* load_txt_texture(string _s, TTF_Font* _font, SDL_Colour _col,
-             SDL_Renderer* _ren);
+void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
+void render_text(const string& _s, SDL_Rect* _r,
+     TTF_Font* _fnt, SDL_Colour _col, SDL_Renderer* _ren);
 
 int main(int argc, char* args[])
 {
@@ -139,6 +143,7 @@ void close(SDL_Window*& _win, SDL_Renderer*& _ren)
 	
 	IMG_Quit();
 	SDL_Quit();
+	TTF_Quit();
 }
 
 SDL_Surface* load_surface(const string& _path)
@@ -183,6 +188,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	Timer loop_timer;
 	const short fps = 60;
 	Uint32 tgt_frame_len = 1000 / fps;
+
+	string endgame_txt = "";
 	
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
 	Ball ball(SDL_Rect{400, 300}, 9, 45);
@@ -200,15 +207,19 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	unsigned short lives0 = 3;
 
+	Text_Object lives0_obj("LIVES: " + to_string(lives0),
+	                      TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                      SDL_Colour{0x30, 0x80, 0xf0, 0x00},
+	                      _ren,
+	                      {700, 20});
+
 	for(unsigned short i = 0; i < bricks.size(); ++i) {
 		bricks[i]->assign_texture((*_texs)[2]);
 	}
 
-	TTF_Font* font0 = TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 28);
-
 	//main loop
-	bool flag_quit = false;
 	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
+	bool flag_quit = false;
 	while(flag_quit == false) {
 		loop_timer.set_start(SDL_GetTicks());
 		
@@ -233,18 +244,19 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			//if ball lost, decrement lives, end game if lives == 0
 			if(--lives0 == 0) {
 				flag_quit = true;
-				cout << "GAME OVER!\nTRY AGAIN ;)\n"; //TODO game over graphics
-				break;
+				endgame_txt = "GAME OVER!";
+				cout << endgame_txt << "\nTRY AGAIN ;)\n";
 			}
 			cerr << "lives: " << lives0 << endl; //TODO print lives on GUI
+			lives0_obj.redraw("LIVES: " + to_string(lives0));
 			ball = Ball(SDL_Rect{400, 300}, 9, 45);
 			ball.assign_texture((*_texs)[1]);
 		}
 
 		if(bricks.size() == 0) {
 			flag_quit = true;
-			cout << "YOU WIN!\n"; //TODO print on GUI
-			break;
+			endgame_txt = "YOU WIN!";
+			cout << endgame_txt << endl;
 		}
 
 		//render sequence
@@ -253,18 +265,21 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		if(wait_len > 0) {
 			SDL_Delay(wait_len);
 		}
+
 		SDL_RenderClear(_ren);
 		
+		lives0_obj.render();
 		paddle0.render(_ren);
 		ball.render(_ren);
 		for(unsigned short i = 0; i < bricks.size(); ++i) {
 			bricks[i]->render(_ren);
 		}
 
-		SDL_Colour txt_col0 = {40, 120, 160};
-		SDL_Texture* final_text_tex = load_txt_texture("YOU WIN", font0, txt_col0, _ren);//TODO ASAP implement properly, this is just proof of concept.
-		if(final_text_tex != NULL) {
-			SDL_RenderCopy(_ren, final_text_tex, NULL, NULL);
+		if(flag_quit == true) {
+			load_endgame_screen(endgame_txt, _ren);
+			SDL_RenderPresent(_ren);
+			SDL_Delay(1000); //wait a sec
+			break;
 		}
 		
 		SDL_RenderPresent(_ren);
@@ -330,7 +345,8 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 	SDL_Delay(200);	
 }
 
-vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren) {
+vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren)
+{
 	vector<shared_ptr<SDL_Texture>> texs;
 	try {
 		shared_ptr<SDL_Texture> shared_tex;
@@ -365,23 +381,47 @@ int check_loss(SDL_Rect* _r, const int _max_y)
 	return 0;
 }
 
-SDL_Texture* load_txt_texture(string _s, TTF_Font* _font, SDL_Colour _col,
-             SDL_Renderer* _ren) {
-	SDL_Surface* txt_surf = TTF_RenderText_Solid(_font, _s.c_str(), _col);
-	if(txt_surf == NULL) {
-		char msg[] = "unable to render text surface. SDL_ttd err = ";
-		cout << msg << TTF_GetError() << endl;
-		return NULL;
+void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren)
+{	
+	SDL_Colour tx_c = {40, 120, 160};
+	TTF_Font* fnt = TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 60);
+
+	if(fnt == NULL) {
+		cerr << "WARNING: could not load font for endgame sequence\n";
+		cerr << "SDL_ttf error: " << TTF_GetError() << endl;
+		return;
 	}
 
-	SDL_Texture* txt_tex = SDL_CreateTextureFromSurface(_ren, txt_surf);
-	if(txt_tex == NULL) {
-		char msg[] = "unable to create texture from rendered text. SDL2 err = ";
-		cout << msg << SDL_GetError() << endl;
-		return NULL;
+	render_text(_end_txt, NULL, fnt, tx_c, _ren);
+
+	TTF_CloseFont(fnt);
+}
+
+void render_text(const string& _s, SDL_Rect* _r,
+     TTF_Font* _fnt, SDL_Colour _col, SDL_Renderer* _ren)
+{
+	if(_s.size() == 0) {
+		cerr << "WARNING: empty string passed to render_text().\n";
+		return;
+	}
+	if(_fnt == NULL || _ren == NULL) {
+		cerr << "WARNING: mandatory parameter NULL: render_text()";
+		return;
 	}
 
-	SDL_FreeSurface(txt_surf); //don't need the surface any more
 
-	return txt_tex;
+	SDL_Texture* tex = utils::load_txt_texture(_s, _fnt, _col, _ren);
+	if(tex == NULL) {return;}
+
+	if(_r != NULL) {
+		int tex_w, tex_h;
+
+		SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
+		if(_r->w != 0) {_r->w = tex_w;}
+		if(_r->h != 0) {_r->h = tex_h;}
+	}
+
+	SDL_RenderCopy(_ren, tex, NULL, _r);
+
+	SDL_DestroyTexture(tex);
 }

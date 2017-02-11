@@ -20,12 +20,14 @@ TODO - cofogo
 - [x] rendering handling
 - [x] rectangular collision handling
 - [x] player livecount
-- [x] game over
-- [x] game won
+- [x] game over/won event
+- [x] system/wrapper for printing text onto the screen
+- [ ] remove redundant text printing operations
+- [ ] reevaluate if text_to_texture should be in utils namespace as there is a wrapper class for that now
 - [ ] gui text
-    - [ ] player live count
+    - [x] player live count
     - [ ] score
-    - [ ] game won/over
+    - [x] game won/over
 - [ ] colour keying or alpha blending
 - [ ] colour modulation
 - [x] impelement fps rate limit (60fps)

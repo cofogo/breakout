@@ -8,12 +8,8 @@ Object::Object(SDL_Rect _rect)
 
 Object::~Object()
 {
-	/*TODO move the texture destruction outside the object or come up
-	with some intelligent way to share the texture between multiple objects*/
-	/*if(m_texture != NULL) {
-		SDL_DestroyTexture(m_texture);
-		m_texture = NULL;
-	}*/
+	//TODO test if the texture is really eventually destroyed
+	//the texure is destroyed by the smart pointer and custom destructor
 }
 
 int Object::assign_texture(shared_ptr<SDL_Texture> _tex)
