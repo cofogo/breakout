@@ -190,12 +190,13 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	Uint32 tgt_frame_len = 1000 / fps;
 
 	string endgame_txt = "";
+	int score0 = 0;
 	
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
 	Ball ball(SDL_Rect{400, 300}, 9, 45);
 	vector<shared_ptr<Brick>> bricks;
 	for(unsigned short i = 0; i < 10; ++i) {
-		for(unsigned short j = 0; j < 1; ++j) {
+		for(unsigned short j = 0; j < 5; ++j) {
 			int x = 20 + (i * 60);
 			int y = 20 + (j * 30);
 			bricks.push_back(shared_ptr<Brick> (new Brick(SDL_Rect{x, y})));
@@ -207,11 +208,16 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	unsigned short lives0 = 3;
 
-	Text_Object lives0_obj("LIVES: " + to_string(lives0),
-	                      TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
-	                      SDL_Colour{0x30, 0x80, 0xf0, 0x00},
-	                      _ren,
-	                      {700, 20});
+	Text_Object lives0_txt("LIVES: " + to_string(lives0),
+	                       TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
+	                       _ren,
+	                       SDL_Rect{700, 20});
+	Text_Object score0_txt("SCORE: " + to_string(score0),
+	                       TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
+	                       _ren,
+	                       SDL_Rect{20, 20});
 
 	for(unsigned short i = 0; i < bricks.size(); ++i) {
 		bricks[i]->assign_texture((*_texs)[2]);
@@ -239,7 +245,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			paddle0.move_r();
 		}
 		
-		ball.update(win_w, win_h, &bricks, paddle0.get_rect());
+		int old_score0 = score0;
+		ball.update(win_w, win_h, &bricks, paddle0.get_rect(), score0);
 		if(check_loss(ball.get_rect(), win_h)) {
 			//if ball lost, decrement lives, end game if lives == 0
 			if(--lives0 == 0) {
@@ -248,9 +255,13 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 				cout << endgame_txt << "\nTRY AGAIN ;)\n";
 			}
 			cerr << "lives: " << lives0 << endl; //TODO print lives on GUI
-			lives0_obj.redraw("LIVES: " + to_string(lives0));
+			lives0_txt.redraw("LIVES: " + to_string(lives0));
 			ball = Ball(SDL_Rect{400, 300}, 9, 45);
 			ball.assign_texture((*_texs)[1]);
+		}
+
+		if(old_score0 != score0) {
+			score0_txt.redraw("SCORE: " + to_string(score0));
 		}
 
 		if(bricks.size() == 0) {
@@ -268,14 +279,16 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 		SDL_RenderClear(_ren);
 		
-		lives0_obj.render();
 		paddle0.render(_ren);
 		ball.render(_ren);
 		for(unsigned short i = 0; i < bricks.size(); ++i) {
 			bricks[i]->render(_ren);
 		}
+		lives0_txt.render();
+		score0_txt.render();
 
 		if(flag_quit == true) {
+			cout << "final score: " << score0 << endl;
 			load_endgame_screen(endgame_txt, _ren);
 			SDL_RenderPresent(_ren);
 			SDL_Delay(1000); //wait a sec

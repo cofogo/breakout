@@ -8,6 +8,8 @@ Ball::Ball(SDL_Rect _rect, short _spd, short _angle)
 , m_dy(0)
 , m_real_x(_rect.x)
 , m_real_y(_rect.y)
+, m_score(0)
+, m_combo(0.0d)
 {
 	change_dir(m_vector_angle);
 }
@@ -60,7 +62,8 @@ void Ball::change_dir(short _angle)
 }
 
 void Ball::update(short _x_max, short _y_max,
-     vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r)
+     vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r,
+	 int& _score0)
 {
 	int left = m_rect.x + m_dx;
 	int right = m_rect.x + m_rect.w + m_dx;
@@ -87,6 +90,7 @@ void Ball::update(short _x_max, short _y_max,
 			m_dy = -m_dy;
 		}
 	}
+
 	//check for and handle collisions
 	for(unsigned i = 0; i < _obsts->size(); ++i) {
 		int obst_left = (*_obsts)[i]->get_rect()->x;
@@ -118,6 +122,10 @@ void Ball::update(short _x_max, short _y_max,
 				m_dx *= -1;
 			}
 
+			//updating combo and score value
+			m_combo += 0.1d;
+			m_score += 100;
+
 			break;
 		}
 	}
@@ -137,9 +145,10 @@ void Ball::update(short _x_max, short _y_max,
 			short pad0_cen_x = (_paddle0_r->x + (_paddle0_r->w / 2));
 			double new_dx = (double)(cen_x - pad0_cen_x) / (_paddle0_r->w / 2);
 			cerr << "new_dx" << fabs(new_dx) << endl;
-			//clamp change range
+			
+			//limit change range
 			if(new_dx > 0.9d) {new_dx = 0.9d;}
-			else if(new_dx < -0.9d) {new_dx == -0.9d;}
+			else if(new_dx < -0.9d) {new_dx = -0.9d;}
 
 			m_dx = new_dx;
 			m_dy = (m_dy > 0)? (1.0d - fabs(new_dx)) : (-1.0d + fabs(new_dx));
@@ -149,7 +158,13 @@ void Ball::update(short _x_max, short _y_max,
 		else {
 			m_dx *= -1;
 		}
-		
+
+		//give score
+		_score0 += m_score * (0.9d + m_combo);
+		m_combo = 0.0d;
+		m_score = 0;
+		//not reseting the m_score would result in an interesting mechanic
+		//the longer the ball lives, the more valuable it becomes
 	}
 
 	//moving the ball

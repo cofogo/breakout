@@ -22,17 +22,18 @@ TODO - cofogo
 - [x] player livecount
 - [x] game over/won event
 - [x] system/wrapper for printing text onto the screen
+- [x] scoring system
 - [ ] remove redundant text printing operations
 - [ ] reevaluate if text_to_texture should be in utils namespace as there is a wrapper class for that now
 - [ ] gui text
     - [x] player live count
-    - [ ] score
+    - [x] score
     - [x] game won/over
+    - [ ] toggleable fps indicator
 - [ ] colour keying or alpha blending
 - [ ] colour modulation
 - [x] impelement fps rate limit (60fps)
 - [ ] find a way to display fps without hogging a lot of compute time
-    - [ ] make fps display toggleable
 
 TODO - luke1222
 ===============
