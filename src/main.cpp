@@ -186,8 +186,10 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 {
 	//init game
 	Timer loop_timer;
-	const short fps = 60;
-	Uint32 tgt_frame_len = 1000 / fps;
+	const short tgt_fps = 60;
+	Uint32 tgt_frame_len = 1000 / tgt_fps;
+	Uint32 frame_len = 0;
+	bool show_fps = true;
 
 	string endgame_txt = "";
 	int score0 = 0;
@@ -208,6 +210,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	unsigned short lives0 = 3;
 
+	//TODO make shared pointer to a default font
 	Text_Object lives0_txt("LIVES: " + to_string(lives0),
 	                       TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
 	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
@@ -218,6 +221,11 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                       _ren,
 	                       SDL_Rect{20, 20});
+	Text_Object fps_txt("FPS: ",
+	                    TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                    SDL_Colour{0x30, 0x80, 0xf0, 0x00},
+	                    _ren,
+	                    SDL_Rect{5, 5});
 
 	for(unsigned short i = 0; i < bricks.size(); ++i) {
 		bricks[i]->assign_texture((*_texs)[2]);
@@ -229,22 +237,29 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	while(flag_quit == false) {
 		loop_timer.set_start(SDL_GetTicks());
 		
+		//input and update phase
 		SDL_Event event;
+		const Uint8* key_states = SDL_GetKeyboardState(NULL);
 		while(SDL_PollEvent(&event) != 0) {
-			if(event.type == SDL_QUIT) {
+			if(event.type == SDL_KEYDOWN) {
+				if(key_states[SDL_SCANCODE_F]) {
+					if(show_fps) {show_fps = false;}
+					else {show_fps = true;}
+				}
+			}
+			else if(event.type == SDL_QUIT) {
 				flag_quit = true;
 			}
 		}
-		
-		//input and update
-		const Uint8* key_states = SDL_GetKeyboardState(NULL);
+
+		//key states to register every frame
 		if(key_states[SDL_SCANCODE_LEFT]) {
 			paddle0.move_l();
 		}
 		else if(key_states[SDL_SCANCODE_RIGHT]) {
 			paddle0.move_r();
 		}
-		
+
 		int old_score0 = score0;
 		ball.update(win_w, win_h, &bricks, paddle0.get_rect(), score0);
 		if(check_loss(ball.get_rect(), win_h)) {
@@ -270,13 +285,16 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			cout << endgame_txt << endl;
 		}
 
-		//render sequence
-		loop_timer.set_end(SDL_GetTicks());
-		Uint32 wait_len = tgt_frame_len - loop_timer.get_duration();
-		if(wait_len > 0) {
-			SDL_Delay(wait_len);
+		if(show_fps) {
+			if(frame_len > 0) {
+				fps_txt.redraw("FPS: " + to_string(1000 / frame_len));
+			}
+			else {
+				fps_txt.redraw("FPS: " + to_string(tgt_fps));
+			}
 		}
 
+		//render phase
 		SDL_RenderClear(_ren);
 		
 		paddle0.render(_ren);
@@ -286,6 +304,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		}
 		lives0_txt.render();
 		score0_txt.render();
+		if(show_fps) {fps_txt.render();}
 
 		if(flag_quit == true) {
 			cout << "final score: " << score0 << endl;
@@ -296,6 +315,16 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		}
 		
 		SDL_RenderPresent(_ren);
+		//limit framerate
+		loop_timer.set_end(SDL_GetTicks());
+		frame_len = loop_timer.get_duration();
+		if(frame_len < tgt_frame_len) {
+			Uint32 wait_len = tgt_frame_len - frame_len;
+			if(wait_len > 0) {
+				SDL_Delay(wait_len);
+				frame_len += wait_len;
+			}
+		}
 	}
 }
 

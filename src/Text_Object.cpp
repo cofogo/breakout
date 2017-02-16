@@ -32,6 +32,10 @@ void Text_Object::render()
 void Text_Object::redraw(const string& _s)
 {
 	m_tex = utils::load_txt_texture(_s, m_font, m_col, m_ren);
+	int w, h;
+	SDL_QueryTexture(m_tex, NULL, NULL, &w, &h);
+	m_rect.w = w;
+	m_rect.h = h;
 }
 
 void Text_Object::set_x(int _x) {m_rect.x = _x;}

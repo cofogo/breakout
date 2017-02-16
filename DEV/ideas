@@ -1,0 +1,7 @@
+- player starts with the ball and releases it with a key
+- blocks with more lives
+- levels
+- different coloured blocks, for different point reward
+- drops
+- ball gets faster with time or with number of hits or both
+- paddle hit influences current direction instead of changing it completely

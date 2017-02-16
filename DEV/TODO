@@ -3,6 +3,7 @@ BACKLOG
 - [ ] implement the second paddle
 - [ ] change round loss condition to no balls left, to support multiple balls
 - [ ] implement last player hit tracking on ball (probs pass ID)
+- [ ] improve game over screen with animations, scoreboard, wait for input to q
 
 TODO - cofogo
 =============
@@ -25,15 +26,15 @@ TODO - cofogo
 - [x] scoring system
 - [ ] remove redundant text printing operations
 - [ ] reevaluate if text_to_texture should be in utils namespace as there is a wrapper class for that now
-- [ ] gui text
+- [x] gui text
     - [x] player live count
     - [x] score
     - [x] game won/over
-    - [ ] toggleable fps indicator
+    - [x] toggleable fps indicator
 - [ ] colour keying or alpha blending
 - [ ] colour modulation
 - [x] impelement fps rate limit (60fps)
-- [ ] find a way to display fps without hogging a lot of compute time
+- [x] find a way to display fps without hogging a lot of compute time
 
 TODO - luke1222
 ===============
