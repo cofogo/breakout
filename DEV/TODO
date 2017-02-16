@@ -4,6 +4,9 @@ BACKLOG
 - [ ] change round loss condition to no balls left, to support multiple balls
 - [ ] implement last player hit tracking on ball (probs pass ID)
 - [ ] improve game over screen with animations, scoreboard, wait for input to q
+- [ ] add error handling when opening fonts (e.g. open fornts from Text_Object)
+- [ ] reevaluate if text_to_texture should be in utils namespace as there is a wrapper class (Text_Object) for that now
+- [ ] improve collisions with a trajectory intercept mechanism, account for multiple collisions per frame
 
 TODO - cofogo
 =============
@@ -24,8 +27,7 @@ TODO - cofogo
 - [x] game over/won event
 - [x] system/wrapper for printing text onto the screen
 - [x] scoring system
-- [ ] remove redundant text printing operations
-- [ ] reevaluate if text_to_texture should be in utils namespace as there is a wrapper class for that now
+- [x] remove redundant text printing operations
 - [x] gui text
     - [x] player live count
     - [x] score

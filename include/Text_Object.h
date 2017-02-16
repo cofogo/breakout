@@ -17,6 +17,7 @@ public:
 	~Text_Object();
 
 	void render();
+	void render_stretched(SDL_Rect* _rec = NULL);
 	void redraw(const string& _s);
 	void set_x(int _x);
 	void set_y(int _y);

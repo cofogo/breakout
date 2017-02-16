@@ -13,6 +13,8 @@ Text_Object::Text_Object(const string& _s,
 	SDL_QueryTexture(m_tex, NULL, NULL, &w, &h);
 	m_rect.w = w;
 	m_rect.h = h;
+
+	if(m_font == NULL) {cerr << "WARNING: Text Object font is NULL!\n";}
 }
 
 Text_Object::~Text_Object()
@@ -27,6 +29,11 @@ Text_Object::~Text_Object()
 void Text_Object::render()
 {
 	SDL_RenderCopy(m_ren, m_tex, NULL, &m_rect);
+}
+
+void Text_Object::render_stretched(SDL_Rect* _rec) //defaults to NULL
+{
+	SDL_RenderCopy(m_ren, m_tex, NULL, _rec);
 }
 
 void Text_Object::redraw(const string& _s)

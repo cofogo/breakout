@@ -38,8 +38,6 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 int check_loss(SDL_Rect* _r, const int _max_h);
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
-void render_text(const string& _s, SDL_Rect* _r,
-     TTF_Font* _fnt, SDL_Colour _col, SDL_Renderer* _ren);
 
 int main(int argc, char* args[])
 {
@@ -425,45 +423,11 @@ int check_loss(SDL_Rect* _r, const int _max_y)
 
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren)
 {	
-	SDL_Colour tx_c = {40, 120, 160};
-	TTF_Font* fnt = TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 60);
+	Text_Object txt_o(_end_txt,
+	                  TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 60),
+	                  SDL_Colour{0x30, 0x80, 0xf0, 0x00},
+	                  _ren,
+	                  SDL_Rect{0,0});
 
-	if(fnt == NULL) {
-		cerr << "WARNING: could not load font for endgame sequence\n";
-		cerr << "SDL_ttf error: " << TTF_GetError() << endl;
-		return;
-	}
-
-	render_text(_end_txt, NULL, fnt, tx_c, _ren);
-
-	TTF_CloseFont(fnt);
-}
-
-void render_text(const string& _s, SDL_Rect* _r,
-     TTF_Font* _fnt, SDL_Colour _col, SDL_Renderer* _ren)
-{
-	if(_s.size() == 0) {
-		cerr << "WARNING: empty string passed to render_text().\n";
-		return;
-	}
-	if(_fnt == NULL || _ren == NULL) {
-		cerr << "WARNING: mandatory parameter NULL: render_text()";
-		return;
-	}
-
-
-	SDL_Texture* tex = utils::load_txt_texture(_s, _fnt, _col, _ren);
-	if(tex == NULL) {return;}
-
-	if(_r != NULL) {
-		int tex_w, tex_h;
-
-		SDL_QueryTexture(tex, NULL, NULL, &tex_w, &tex_h);
-		if(_r->w != 0) {_r->w = tex_w;}
-		if(_r->h != 0) {_r->h = tex_h;}
-	}
-
-	SDL_RenderCopy(_ren, tex, NULL, _r);
-
-	SDL_DestroyTexture(tex);
+	txt_o.render_stretched();
 }
