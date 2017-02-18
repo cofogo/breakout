@@ -1,12 +1,16 @@
 BACKLOG
 =======
-- [ ] implement the second paddle
-- [ ] change round loss condition to no balls left, to support multiple balls
+- [ ] respawn bricks when all are gone
+- [ ] implement a scoreboard (overlay on the game over animation maybe? :))
+- [ ] colour modulation
+- [ ] more colours for bricks (via colour modulation most likely)
+- [ ] make more levels
 - [ ] implement last player hit tracking on ball (probs pass ID)
-- [ ] improve game over screen with animations, scoreboard, wait for input to q
-- [ ] add error handling when opening fonts (e.g. open fornts from Text_Object)
-- [ ] reevaluate if text_to_texture should be in utils namespace as there is a wrapper class (Text_Object) for that now
-- [ ] improve collisions with a trajectory intercept mechanism, account for multiple collisions per frame
+- [ ] change round loss condition to no balls left, to support multiple balls
+- [ ] optimise text rendering (good candidate: texture atlass technique)
+- [?] harder to destroy bricks
+- [?] animated bricks
+- [?] drops
 
 TODO - cofogo
 =============
@@ -33,10 +37,15 @@ TODO - cofogo
     - [x] score
     - [x] game won/over
     - [x] toggleable fps indicator
-- [ ] colour keying or alpha blending
-- [ ] colour modulation
+- [x] use alpha channeel when loading gfx assets
+- [x] remake gfx assets to use new alpha functionality
 - [x] impelement fps rate limit (60fps)
 - [x] find a way to display fps without hogging a lot of compute time
+- [ ] 02-18 improve game over screen with animations, wait for input to q
+- [ ] 02-25 improve collisions with a trajectory intercept mechanism, account for multiple collisions per frame
+- [ ] 02-27 implement the second paddle
+- [ ] 02-28 add error handling when opening fonts (e.g. open fornts from Text_Object)
+- [ ] 03-01 reevaluate if text_to_texture should be in utils namespace as there is a wrapper class (Text_Object) for that now
 
 TODO - luke1222
 ===============

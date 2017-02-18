@@ -31,6 +31,7 @@ int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
 int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
 void close(SDL_Window*& _win, SDL_Renderer*& _ren);
 SDL_Surface* load_surface(const string& _path);
+SDL_Surface* load_surface_a(const string& _path);
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren);
 vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren);
 void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
@@ -157,11 +158,29 @@ SDL_Surface* load_surface(const string& _path)
 	return loaded;
 }
 
+SDL_Surface* load_surface_a(const string& _path)
+{
+	SDL_Surface* loaded = IMG_Load(_path.c_str());
+	if(loaded == NULL){
+		cerr << "ERROR: Could not load picture!\n";
+		cerr << "file path: " << _path << endl;
+		cerr << "SDL error = " << IMG_GetError() << endl;
+		return NULL;
+	}
+
+	SDL_Surface* with_alpha = SDL_ConvertSurfaceFormat(loaded,
+	                          SDL_PIXELFORMAT_RGBA8888, 0);
+
+	SDL_FreeSurface(loaded);
+	loaded = NULL;	
+	return with_alpha;
+}
+
 SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren)
 {
 	SDL_Texture* tex = NULL;
 	
-	SDL_Surface* tmp_surf = load_surface(_path);
+	SDL_Surface* tmp_surf = load_surface_a(_path);
 	if(tmp_surf == NULL) {
 		return NULL;
 	}
