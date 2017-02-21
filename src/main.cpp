@@ -225,7 +225,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	paddle0.assign_texture((*_texs)[0]);
 	ball.assign_texture((*_texs)[1]);
 
-	unsigned short lives0 = 3;
+	unsigned short lives0 = 1;
 
 	//TODO make shared pointer to a default font
 	Text_Object lives0_txt("LIVES: " + to_string(lives0),
@@ -257,6 +257,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		//input and update phase
 		SDL_Event event;
 		const Uint8* key_states = SDL_GetKeyboardState(NULL);
+		//key down/up check
 		while(SDL_PollEvent(&event) != 0) {
 			if(event.type == SDL_KEYDOWN) {
 				if(key_states[SDL_SCANCODE_F]) {
@@ -269,7 +270,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			}
 		}
 
-		//key states to register every frame
+		//key pressed check
+		//TODO see if can be moved to loop above (maybe catch another type evnt)
 		if(key_states[SDL_SCANCODE_LEFT]) {
 			paddle0.move_l();
 		}
@@ -332,6 +334,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		}
 		
 		SDL_RenderPresent(_ren);
+
 		//limit framerate
 		loop_timer.set_end(SDL_GetTicks());
 		frame_len = loop_timer.get_duration();
@@ -345,59 +348,65 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	}
 }
 
+//TODO polish the animation closer to the end of the project
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 {
-	//clear screen, copy texture on, refresh (present)
-	//TODO decide if there should be an exit animaiton, make a proper one if yes
-	for(unsigned short i = 0; i < _win_h; ++i) {
+	vector<Text_Object*> text(2);
+	text[0] = new Text_Object("GAME OVER",
+	                      TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 36),
+	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
+	                      _ren,
+	                      SDL_Rect{200, 100});
+	text[1] = new Text_Object("space for a scoreboard here ;)",
+	                      TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 18),
+	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
+	                      _ren,
+	                      SDL_Rect{200, 150});
+
+	unsigned short linenum = 10;
+	int lines_ay[linenum];
+	int lines_by[linenum];
+	float lines_dv_y[linenum];
+	int start_y = _win_h / 2;
+	for(unsigned i = 0; i < linenum; ++i) {
+		lines_ay[i] = start_y;
+		lines_by[i] = start_y;
+		lines_dv_y[i] = (1 + i) * 2;
+		start_y *= 1.1f;
+	}
+
+	bool flag_quit = false;
+	while(!flag_quit) {
+		SDL_Event event;
+		while(SDL_PollEvent(&event) != 0) {
+			if(event.type == SDL_QUIT) {
+				flag_quit = true;
+			}
+		}
+
 		SDL_SetRenderDrawColor(_ren, 0xff, 0xff, 0xff, 0xff);
 		SDL_RenderClear(_ren);
 		//SDL_RenderCopy(_ren, texs[srf_action_x], NULL, NULL);
 		
 		//draw primitives
-		SDL_Rect shape_rect0 = {i, (_win_h / 2) + 20, _win_w / 10, _win_h / 10};
-		SDL_Rect shape_rect1 = {_win_w - i, (_win_h / 2) - 20, 
-		                        (_win_w / 2) - i, (_win_h / 2) - i};
-		SDL_SetRenderDrawColor(_ren, 0xcc, 0xcc, 0xff, 0xff);
-		SDL_RenderFillRect(_ren, &shape_rect0);
-		
-		SDL_SetRenderDrawColor(_ren, 0x00, 0x00, 0xff, 0xff);
-		SDL_RenderDrawRect(_ren, &shape_rect1);
-	
 		SDL_SetRenderDrawColor(_ren, 0xff, 0x00, 0x00, 0xff);
-		SDL_RenderDrawLine(_ren, 0, i, _win_w, i);
-		
-		//draw wide dashed line
-		SDL_SetRenderDrawColor(_ren, 0x55, 0xaa, 0x55, 0xff);
-		unsigned short dot_line_x = (i * 2 < _win_w)? (i * 2) : (i * 2) - _win_w;
-		for(unsigned short j = 0; j < _win_h; j += 10) {
-			SDL_RenderDrawPoint(_ren, dot_line_x, j);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 1);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 3);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 5);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 6);
+		for(unsigned i = 0; i < linenum; ++i) {
+			SDL_RenderDrawLine(_ren, 0, lines_ay[i], _win_w, lines_by[i]);
+			lines_ay[i] += lines_dv_y[i];
+			lines_by[i] += lines_dv_y[i];
+			lines_dv_y[i] *= 1.05f;
+			if(lines_ay[i] > _win_h) {
+				lines_ay[i] = _win_h / 2;
+				lines_by[i] = _win_h / 2;
+				lines_dv_y[i] = 1;
+			}
 		}
-		++dot_line_x;
-		SDL_SetRenderDrawColor(_ren, 0x55, 0xaa, 0x55, 0xff);
-		for(unsigned short j = 0; j < _win_h; j += 10) {
-			SDL_RenderDrawPoint(_ren, dot_line_x, j);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 1);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 3);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 5);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 6);
-		}
-		++dot_line_x;
-		SDL_SetRenderDrawColor(_ren, 0x55, 0xaa, 0x55, 0xff);
-		for(unsigned short j = 0; j < _win_h; j += 10) {
-			SDL_RenderDrawPoint(_ren, dot_line_x, j);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 1);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 3);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 5);
-			SDL_RenderDrawPoint(_ren, dot_line_x, j + 6);
-		}
+
+		text[0]->render();
+		text[1]->render();
 		
 		SDL_RenderPresent(_ren);
-		SDL_Delay(3);
+		SDL_Delay(30);
 	}
 	
 	SDL_RenderPresent(_ren);
