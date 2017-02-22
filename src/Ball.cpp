@@ -61,14 +61,15 @@ void Ball::change_dir(short _angle)
 	cerr << "ball_y: " << m_real_y << endl;
 }
 
+//TODO move collision, score, etc logic separatly. 'Cause spaghetti
 void Ball::update(short _x_max, short _y_max,
      vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r,
 	 int& _score0)
 {
-	int left = m_rect.x + m_dx;
-	int right = m_rect.x + m_rect.w + m_dx;
-	int top = m_rect.y + m_dy;
-	int bot = m_rect.y + m_rect.h  + m_dy;
+	int left = m_rect.x;
+	int right = m_rect.x + m_rect.w;
+	int top = m_rect.y;
+	int bot = m_rect.y + m_rect.h;
 	int cen_x = m_rect.x + (m_rect.w / 2);
 	int cen_y = m_rect.y + (m_rect.h / 2);
 
@@ -109,6 +110,7 @@ void Ball::update(short _x_max, short _y_max,
 		else {
 			//collision - have to find direction change
 			cerr << "Collision!\n";
+			//TODO move brick destruction to where it belongs
 			//destroy brick
 			(*_obsts)[i] = _obsts->back();
 			(*_obsts).pop_back();

@@ -41,7 +41,7 @@ TODO - cofogo
 - [x] remake gfx assets to use new alpha functionality
 - [x] impelement fps rate limit (60fps)
 - [x] find a way to display fps without hogging a lot of compute time
-- [ ] 02-18 improve game over screen with animations, wait for input to q
+- [x] 02-21 improve game over screen with animations, wait for input to q
 - [ ] 02-25 improve collisions with a trajectory intercept mechanism, account for multiple collisions per frame
 - [ ] 02-27 implement the second paddle
 - [ ] 02-28 add error handling when opening fonts (e.g. open fornts from Text_Object)

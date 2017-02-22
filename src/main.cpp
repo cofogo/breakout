@@ -225,7 +225,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	paddle0.assign_texture((*_texs)[0]);
 	ball.assign_texture((*_texs)[1]);
 
-	unsigned short lives0 = 1;
+	unsigned short lives0 = 3;
 
 	//TODO make shared pointer to a default font
 	Text_Object lives0_txt("LIVES: " + to_string(lives0),
