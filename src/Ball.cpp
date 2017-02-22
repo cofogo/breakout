@@ -62,6 +62,7 @@ void Ball::change_dir(short _angle)
 }
 
 //TODO move collision, score, etc logic separatly. 'Cause spaghetti
+//TODO unify collision handling to all box objects and fix the madness
 void Ball::update(short _x_max, short _y_max,
      vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r,
 	 int& _score0)
@@ -96,10 +97,14 @@ void Ball::update(short _x_max, short _y_max,
 	for(unsigned i = 0; i < _obsts->size(); ++i) {
 		int obst_left = (*_obsts)[i]->get_rect()->x;
 		int obst_right = (*_obsts)[i]->get_rect()->x
-		              + (*_obsts)[i]->get_rect()->w;
+		               + (*_obsts)[i]->get_rect()->w;
 		int obst_top = (*_obsts)[i]->get_rect()->y;
 		int obst_bot = (*_obsts)[i]->get_rect()->y
 		             + (*_obsts)[i]->get_rect()->h;
+		int obst_cen_x = (*_obsts)[i]->get_rect()->x
+		               + ((*_obsts)[i]->get_rect()->w / 2);
+		int obst_cen_y = (*_obsts)[i]->get_rect()->y
+		               + ((*_obsts)[i]->get_rect()->h / 2);
 
 		if(left > obst_right
 		|| right < obst_left
@@ -115,14 +120,31 @@ void Ball::update(short _x_max, short _y_max,
 			(*_obsts)[i] = _obsts->back();
 			(*_obsts).pop_back();
 			
-			//TODO - this logic is simplified, sometimes misbehaves
-			//polish laer
-			if(cen_y > obst_bot || cen_y < obst_top) {
+			double prev_cen_x = (double)cen_x - (m_dx * m_total_speed);
+			double prev_cen_y = (double)cen_y - (m_dy * m_total_speed);
+
+			double relative_dist_x = (fabs(prev_cen_x - cen_x)) / m_dx;
+			double relative_dist_y = (fabs(prev_cen_y - cen_y)) / m_dy;
+
+			/* if relatively further away from x, collision happened on y
+			 * and vice versa. If both are equal, both directions flip.
+			*/
+			//FIXME something is off, analyse and fix
+			if(relative_dist_x >= relative_dist_y) {
+				//collision on y
 				m_dy *= -1;
 			}
-			else {
+			if(relative_dist_y >= relative_dist_x) {
+				//collision on x
 				m_dx *= -1;
 			}
+
+//			if(cen_y > obst_bot || cen_y < obst_top) {
+//				m_dy *= -1;
+//			}
+//			else {
+//				m_dx *= -1;
+//			}
 
 			//updating combo and score value
 			m_combo += 0.1d;
