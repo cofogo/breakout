@@ -101,6 +101,8 @@ void Ball::update(short _x_max, short _y_max,
 		int obst_top = (*_obsts)[i]->get_rect()->y;
 		int obst_bot = (*_obsts)[i]->get_rect()->y
 		             + (*_obsts)[i]->get_rect()->h;
+		int obst_w = (*_obsts)[i]->get_rect()->w;
+		int obst_h = (*_obsts)[i]->get_rect()->h;
 		int obst_cen_x = (*_obsts)[i]->get_rect()->x
 		               + ((*_obsts)[i]->get_rect()->w / 2);
 		int obst_cen_y = (*_obsts)[i]->get_rect()->y
@@ -112,9 +114,16 @@ void Ball::update(short _x_max, short _y_max,
 		|| bot < obst_top
 		) { // no collision
 		}
+		//TODO move collision reaction to a separate function, for clarity
+		//TODO (later) rethink colission reaction code, there must be a more elegant, but readable solution
 		else {
 			//collision - have to find direction change
 			cerr << "Collision!\n";
+
+			//updating combo and score values
+			m_combo += 0.1d;
+			m_score += 100;
+
 			//TODO move brick destruction to where it belongs
 			//destroy brick
 			(*_obsts)[i] = _obsts->back();
@@ -122,33 +131,39 @@ void Ball::update(short _x_max, short _y_max,
 			
 			double prev_cen_x = (double)cen_x - (m_dx * m_total_speed);
 			double prev_cen_y = (double)cen_y - (m_dy * m_total_speed);
+			//calculate distance between walls on x and y axes
+			double dist_x = fabs(prev_cen_x - obst_cen_x)
+			              - (obst_w/2) - (m_rect.w/2);
+			double dist_y = fabs(prev_cen_y - obst_cen_y)
+			              - (obst_h/2) - (m_rect.h/2);
 
-			double relative_dist_x = (fabs(prev_cen_x - cen_x)) / m_dx;
-			double relative_dist_y = (fabs(prev_cen_y - cen_y)) / m_dy;
+			//for debug
+			cerr << "prev cen x/y: " << prev_cen_x << "/" << prev_cen_y << endl;
+			cerr << "curr o_c x/y: " << obst_cen_x << "/" << obst_cen_y << endl;
+			cerr << "curr dst x/y: " << dist_x << "/" << dist_y << endl;
 
-			/* if relatively further away from x, collision happened on y
-			 * and vice versa. If both are equal, both directions flip.
-			*/
-			//FIXME something is off, analyse and fix
-			if(relative_dist_x >= relative_dist_y) {
-				//collision on y
-				m_dy *= -1;
-			}
-			if(relative_dist_y >= relative_dist_x) {
-				//collision on x
+			//if dist is negative, collision must have not happened on that axis
+			if(dist_x < 0) {m_dy *= -1; break;}
+			if(dist_y < 0) {m_dx *= -1; break;}
+
+			/* if relatively closer to x, collision happened on x
+			 * and vice versa. If both are equal, both directions flip. */
+			double relative_dist_x = dist_x / fabs(m_dx * m_total_speed);
+			double relative_dist_y = dist_y / fabs(m_dy * m_total_speed);
+
+			if(relative_dist_x <= relative_dist_y) {
+				//vertical collision
 				m_dx *= -1;
+				cerr << "X flip ";
 			}
-
-//			if(cen_y > obst_bot || cen_y < obst_top) {
-//				m_dy *= -1;
-//			}
-//			else {
-//				m_dx *= -1;
-//			}
-
-			//updating combo and score value
-			m_combo += 0.1d;
-			m_score += 100;
+			if(relative_dist_y <= relative_dist_x) {
+				//horizontal collision
+				m_dy *= -1;
+				cerr << "Y flip ";
+			}
+			cerr << "rel_d_x/rel_d_y: " << relative_dist_x
+			     << "/" << relative_dist_y << endl;
+			cerr << "qdx/qdy: " << m_dx << "/" << m_dy << endl;
 
 			break;
 		}
@@ -171,8 +186,9 @@ void Ball::update(short _x_max, short _y_max,
 			cerr << "new_dx" << fabs(new_dx) << endl;
 			
 			//limit change range
-			if(new_dx > 0.9d) {new_dx = 0.9d;}
-			else if(new_dx < -0.9d) {new_dx = -0.9d;}
+			double q_limit = 0.8d;
+			if(new_dx > q_limit) {new_dx = q_limit;}
+			else if(new_dx < -q_limit) {new_dx = -q_limit;}
 
 			m_dx = new_dx;
 			m_dy = (m_dy > 0)? (1.0d - fabs(new_dx)) : (-1.0d + fabs(new_dx));

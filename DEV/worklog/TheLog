@@ -176,3 +176,12 @@ Project time: 2d. 08:21:46
 Session time: 05:03:44
 Project time: 2d. 13:25:30
 
+[NEW SESSION] : 2017-02-24[08:02:05]Friday
+[08:02:21] (yesterday) fixing new colission reaction algorithm
+[08:03:16] fixed colission reaction mechanism, seems to work quite well, but the
+code is a bit clumsy, will look for a more elegant solution later maybe. Allso,
+more thorough testing would be a good thing.
+[END OF SESSION] : 2017-02-24[08:05:54]Friday
+Session time: 03:03:49
+Project time: 2d. 16:29:19
+

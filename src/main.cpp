@@ -250,6 +250,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	//main loop
 	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
+	bool pause = false;
 	bool flag_quit = false;
 	while(flag_quit == false) {
 		loop_timer.set_start(SDL_GetTicks());
@@ -264,11 +265,17 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 					if(show_fps) {show_fps = false;}
 					else {show_fps = true;}
 				}
+				if(key_states[SDL_SCANCODE_P]) {
+					if(pause) {pause = false;}
+					else {pause = true;}
+				}
 			}
 			else if(event.type == SDL_QUIT) {
 				flag_quit = true;
 			}
 		}
+
+		if(pause) {SDL_Delay(30); continue;}
 
 		//key pressed check
 		//TODO see if can be moved to loop above (maybe catch another type evnt)
