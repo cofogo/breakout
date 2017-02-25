@@ -11,16 +11,16 @@ using std::to_string;
 #include <memory>
 using std::shared_ptr;
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+
 #include "utils.h"
 #include "Timer.h"
 #include "Paddle.h"
 #include "Ball.h"
 #include "Brick.h"
 #include "Text_Object.h"
-
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 
 const int win_w = 800;
 const int win_h = 640;
