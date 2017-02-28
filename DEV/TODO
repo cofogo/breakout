@@ -5,9 +5,9 @@ BACKLOG
 - [ ] respawn bricks when all are gone
 - [ ] implement a scoreboard (overlay on the game over animation :))
 - [ ] colour modulation
-- [ ] review collision engine, move into a separate module
-- [ ] untangle colission detection from colission reaction, same module tho prob
-- [ ] improve collision engine - multiple collisions per frame
+- [ ] collision engine - review, move into a separate module
+- [ ] collision engine - untangle colission detection from colission reactio
+- [ ] collision engine - multiple collisions per frame
 - [ ] implement last player hit tracking on ball (probs pass ID)
 - [ ] optimise text rendering (good candidate: texture atlass technique)
     - [ ] use alpha blended text textures - shouldn't be heavy if well optimised
@@ -51,9 +51,9 @@ TODO - cofogo
 - [x] impelement fps rate limit (60fps)
 - [x] find a way to display fps without hogging a lot of compute time
 - [x] 02-21 improve game over screen with animations, wait for input to q
-- [ ] 02-25 improve collisions with a trajectory intercept mechanism
-- [ ] 02-28 add error handling when opening fonts (e.g. open fornts from Text_Object)
-- [ ] 03-01 reevaluate if text_to_texture should be in utils namespace as there is a wrapper class (Text_Object) for that now
+- [x] 02-28 improve collisions with a trajectory intercept mechanism
+- [ ] 03-01 add error handling when opening fonts (e.g. open fornts from Text_Object)
+- [ ] 03-02 reevaluate if text_to_texture should be in utils namespace as there is a wrapper class (Text_Object) for that now
 
 TODO - luke1222
 ===============
