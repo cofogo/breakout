@@ -165,7 +165,32 @@ void Ball::update(short _x_max, short _y_max,
 			     << "/" << relative_dist_y << endl;
 			cerr << "qdx/qdy: " << m_dx << "/" << m_dy << endl;
 
-			break;
+			//moving the ball to colission point
+			double trans_rem = m_total_speed;
+			if(dist_x > 0) {
+				trans_rem -= dist_x;
+				if(m_dy > 0) {
+					m_rect.x = m_real_x += dist_x;
+				}
+				else {
+					m_rect.x = m_real_x -= dist_x;
+				}
+			}
+			if(dist_y > 0) {
+				trans_rem -= dist_y;
+				if(m_dy > 0) {
+					m_rect.y = m_real_y += dist_y;
+				}
+				else {
+					m_rect.y = m_real_y -= dist_y;
+				}
+			}
+			
+			//moving the ball with energy remaining after impact
+			m_rect.x = m_real_x += m_dx * trans_rem;
+			m_rect.y = m_real_y += m_dy * trans_rem;
+
+			return;
 		}
 	}
 
