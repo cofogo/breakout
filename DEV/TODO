@@ -1,17 +1,12 @@
-[?] - sounds cool, but outside of project scope. Don't get carried away ;)
+[?] = sounds cool, but outside of project scope. Don't get carried away ;)
 
 BACKLOG
 =======
-- [ ] respawn bricks when all are gone
-- [ ] implement a scoreboard (overlay on the game over animation :))
-- [ ] colour modulation
-- [ ] collision engine - review, move into a separate module
-- [ ] collision engine - untangle colission detection from colission reactio
-- [ ] collision engine - multiple collisions per frame
-- [ ] implement last player hit tracking on ball (probs pass ID)
 - [ ] optimise text rendering (good candidate: texture atlass technique)
     - [ ] use alpha blended text textures - shouldn't be heavy if well optimised
 - [ ] implement the second paddle
+- [ ] implement last player hit tracking on ball (probs pass ID)
+- [ ] colour modulation
 - [ ] implement second ball for the second player.
 - [ ] change round loss condition to no balls left, to support multiple balls
 - [ ] players start with ball glued to paddle, release with button or time
@@ -52,8 +47,13 @@ TODO - cofogo
 - [x] find a way to display fps without hogging a lot of compute time
 - [x] 02-21 improve game over screen with animations, wait for input to q
 - [x] 02-28 improve collisions with a trajectory intercept mechanism
-- [ ] 03-01 add error handling when opening fonts (e.g. open fornts from Text_Object)
-- [ ] 03-02 reevaluate if text_to_texture should be in utils namespace as there is a wrapper class (Text_Object) for that now
+- [x] 03-01 add error handling when opening fonts (e.g. open fornts from Text_Object)
+- [x] 03-01 move text_to_texture to Text_Object
+- [ ] 03-02 respawn bricks when all are gone
+- [ ] 03-03 implement a scoreboard (overlay on the game over animation :))
+- [ ] 03-10 collision engine - review, move into a separate module
+- [ ] 03-11 collision engine - untangle colission detection from colission reaction
+- [ ] 03-15 collision engine - multiple collisions per frame
 
 TODO - luke1222
 ===============

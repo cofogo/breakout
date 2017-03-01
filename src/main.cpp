@@ -210,17 +210,17 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	//TODO make shared pointer to a default font
 	Text_Object lives0_txt("LIVES: " + to_string(lives0),
-	                       TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                       "assets/fonts/DejaVuSansMono.ttf", 20,
 	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                       _ren,
 	                       SDL_Rect{700, 20});
 	Text_Object score0_txt("SCORE: " + to_string(score0),
-	                       TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                       "assets/fonts/DejaVuSansMono.ttf", 20,
 	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                       _ren,
 	                       SDL_Rect{20, 20});
 	Text_Object fps_txt("FPS: ",
-	                    TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 20),
+	                    "assets/fonts/DejaVuSansMono.ttf", 20,
 	                    SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                    _ren,
 	                    SDL_Rect{5, 5});
@@ -341,12 +341,12 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 {
 	vector<Text_Object*> text(2);
 	text[0] = new Text_Object("GAME OVER",
-	                      TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 36),
+	                      "assets/fonts/DejaVuSansMono.ttf", 36,
 	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
 	                      _ren,
 	                      SDL_Rect{200, 100});
 	text[1] = new Text_Object("space for a scoreboard here ;)",
-	                      TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 18),
+	                      "assets/fonts/DejaVuSansMono.ttf", 18,
 	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
 	                      _ren,
 	                      SDL_Rect{200, 150});
@@ -396,9 +396,6 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 		SDL_RenderPresent(_ren);
 		SDL_Delay(30);
 	}
-	
-	SDL_RenderPresent(_ren);
-	SDL_Delay(200);	
 }
 
 vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren)
@@ -440,7 +437,7 @@ int check_loss(SDL_Rect* _r, const int _max_y)
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren)
 {	
 	Text_Object txt_o(_end_txt,
-	                  TTF_OpenFont("assets/fonts/DejaVuSansMono.ttf", 60),
+	                  "assets/fonts/DejaVuSansMono.ttf", 60,
 	                  SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                  _ren,
 	                  SDL_Rect{0,0});

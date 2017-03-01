@@ -199,3 +199,11 @@ rebound.
 Session time: 01:31:10
 Project time: 67h (2d. 19:31:49)
 
+[NEW SESSION] : 2017-03-01[07:18:10]Wednesday
+[07:19:31] added error handling for text objects
+[07:19:52] made text to texture conversion internal for Text_Object
+[07:19:52] planned next couple of weeks of work
+[END OF SESSION] : 2017-03-01[07:20:32]Wednesday
+Session time: 01:32:22
+Project time: 69h (2d. 21:04:11)
+
