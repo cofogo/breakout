@@ -38,6 +38,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 int check_loss(SDL_Rect* _r, const int _max_h);
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
+void make_bricks(vector<shared_ptr<Brick>>& _bricks,
+                 shared_ptr<SDL_Texture> _tex);
 
 int main(int argc, char* args[])
 {
@@ -191,17 +193,12 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	string endgame_txt = "";
 	int score0 = 0;
-	
+
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
+	
 	Ball ball(SDL_Rect{400, 300}, 9, 45);
 	vector<shared_ptr<Brick>> bricks;
-	for(unsigned short i = 0; i < 10; ++i) {
-		for(unsigned short j = 0; j < 5; ++j) {
-			int x = 20 + (i * 60);
-			int y = 20 + (j * 30);
-			bricks.push_back(shared_ptr<Brick> (new Brick(SDL_Rect{x, y})));
-		}
-	}
+	make_bricks(bricks, (*_texs)[2]);
 	
 	paddle0.assign_texture((*_texs)[0]);
 	ball.assign_texture((*_texs)[1]);
@@ -224,10 +221,6 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	                    SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                    _ren,
 	                    SDL_Rect{5, 5});
-
-	for(unsigned short i = 0; i < bricks.size(); ++i) {
-		bricks[i]->assign_texture((*_texs)[2]);
-	}
 
 	//main loop
 	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
@@ -286,10 +279,11 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			score0_txt.redraw("SCORE: " + to_string(score0));
 		}
 
+		//if all bricks are gone, make a new array when ball is close to paddle
 		if(bricks.size() == 0) {
-			flag_quit = true;
-			endgame_txt = "YOU WIN!";
-			cout << endgame_txt << endl;
+			ball = Ball(SDL_Rect{400, 300}, 9, 45);
+			ball.assign_texture((*_texs)[1]);
+			make_bricks(bricks, (*_texs)[2]);
 		}
 
 		if(show_fps) {
@@ -443,4 +437,22 @@ void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren)
 	                  SDL_Rect{0,0});
 
 	txt_o.render_stretched();
+}
+
+void make_bricks(vector<shared_ptr<Brick>>& _bricks,
+                 shared_ptr<SDL_Texture> _tex)
+{
+	unsigned short cols = 10, rows = 5;
+
+	for(unsigned short i = 0; i < cols; ++i) {
+		for(unsigned short j = 0; j < rows; ++j) {
+			int x = 20 + (i * 60);
+			int y = 20 + (j * 30);
+			_bricks.push_back(shared_ptr<Brick> (new Brick(SDL_Rect{x, y})));
+		}
+	}
+
+	for(unsigned short i = 0; i < _bricks.size(); ++i) {
+		_bricks[i]->assign_texture(_tex);
+	}
 }

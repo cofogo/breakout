@@ -237,3 +237,5 @@ void Ball::update(short _x_max, short _y_max,
 	m_rect.x = m_real_x += m_dx * m_total_speed;
 	m_rect.y = m_real_y += m_dy * m_total_speed;
 }
+
+void Ball::set_xy(double _x, double _y) {m_real_x = _x; m_real_y = _y;}
