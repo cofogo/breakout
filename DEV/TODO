@@ -49,7 +49,7 @@ TODO - cofogo
 - [x] 02-28 improve collisions with a trajectory intercept mechanism
 - [x] 03-01 add error handling when opening fonts (e.g. open fornts from Text_Object)
 - [x] 03-01 move text_to_texture to Text_Object
-- [ ] 03-02 respawn bricks when all are gone
+- [x] 03-02 respawn bricks when all are gone
 - [ ] 03-03 implement a scoreboard (overlay on the game over animation :))
 - [ ] 03-10 collision engine - review, move into a separate module
 - [ ] 03-11 collision engine - untangle colission detection from colission reaction

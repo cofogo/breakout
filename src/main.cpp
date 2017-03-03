@@ -191,8 +191,11 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	Uint32 frame_len = 0;
 	bool show_fps = true;
 
+	string def_font_path = "assets/fonts/DejaVuSansMono.ttf";
+
 	string endgame_txt = "";
 	int score0 = 0;
+	unsigned short lives0 = 3;
 
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
 	
@@ -203,27 +206,28 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 	paddle0.assign_texture((*_texs)[0]);
 	ball.assign_texture((*_texs)[1]);
 
-	unsigned short lives0 = 3;
-
-	//TODO make shared pointer to a default font
-	Text_Object lives0_txt("LIVES: " + to_string(lives0),
-	                       "assets/fonts/DejaVuSansMono.ttf", 20,
+	Text_Object lives0_txt(5, def_font_path, 20,
 	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                       _ren,
 	                       SDL_Rect{700, 20});
-	Text_Object score0_txt("SCORE: " + to_string(score0),
-	                       "assets/fonts/DejaVuSansMono.ttf", 20,
+	Text_Object score0_txt(5, def_font_path, 20,
 	                       SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                       _ren,
 	                       SDL_Rect{20, 20});
-	Text_Object fps_txt("FPS: ",
-	                    "assets/fonts/DejaVuSansMono.ttf", 20,
+	Text_Object fps_txt(5, def_font_path, 20,
 	                    SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                    _ren,
 	                    SDL_Rect{5, 5});
 
+	lives0_txt.set_text_ln(0, "LIVES: " + to_string(lives0));
+	score0_txt.set_text_ln(0, "SCORE: " + to_string(score0));
+	fps_txt.set_text_ln(0, "FPS: ");
+
+	lives0_txt.redraw();
+	score0_txt.redraw();
+	fps_txt.redraw();
+
 	//main loop
-	SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
 	bool pause = false;
 	bool flag_quit = false;
 	while(flag_quit == false) {
@@ -270,13 +274,15 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 				cout << endgame_txt << "\nTRY AGAIN ;)\n";
 			}
 			cerr << "lives: " << lives0 << endl; //TODO print lives on GUI
-			lives0_txt.redraw("LIVES: " + to_string(lives0));
+			lives0_txt.set_text_ln(0, "LIVES: " + to_string(lives0));
+			lives0_txt.redraw();
 			ball = Ball(SDL_Rect{400, 300}, 9, 45);
 			ball.assign_texture((*_texs)[1]);
 		}
 
 		if(old_score0 != score0) {
-			score0_txt.redraw("SCORE: " + to_string(score0));
+			score0_txt.set_text_ln(0, "SCORE: " + to_string(score0));
+			score0_txt.redraw();
 		}
 
 		//if all bricks are gone, make a new array when ball is close to paddle
@@ -288,14 +294,17 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 		if(show_fps) {
 			if(frame_len > 0) {
-				fps_txt.redraw("FPS: " + to_string(1000 / frame_len));
+				fps_txt.set_text_ln(0, "FPS: " + to_string(1000 / frame_len));
+				fps_txt.redraw();
 			}
 			else {
-				fps_txt.redraw("FPS: " + to_string(tgt_fps));
+				fps_txt.set_text_ln(0, "FPS: " + to_string(tgt_fps));
+				fps_txt.redraw();
 			}
 		}
 
 		//render phase
+		SDL_SetRenderDrawColor(_ren, 0x00, 0x20, 0x20, 0xff);
 		SDL_RenderClear(_ren);
 		
 		paddle0.render(_ren);
@@ -334,16 +343,22 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 {
 	vector<Text_Object*> text(2);
-	text[0] = new Text_Object("GAME OVER",
-	                      "assets/fonts/DejaVuSansMono.ttf", 36,
+	string def_font_path = "assets/fonts/DejaVuSansMono.ttf";
+	text[0] = new Text_Object(5,
+	                      def_font_path, 36,
 	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
 	                      _ren,
 	                      SDL_Rect{200, 100});
-	text[1] = new Text_Object("space for a scoreboard here ;)",
-	                      "assets/fonts/DejaVuSansMono.ttf", 18,
+	text[1] = new Text_Object(5,
+	                      def_font_path, 18,
 	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
 	                      _ren,
 	                      SDL_Rect{200, 150});
+
+	text[0]->set_text_ln(0, "GAME OVER");
+	text[0]->redraw();
+	text[1]->set_text_ln(0, "space for a scoreboard here ;)");
+	text[1]->redraw();
 
 	unsigned short linenum = 10;
 	int lines_ay[linenum];
@@ -430,11 +445,14 @@ int check_loss(SDL_Rect* _r, const int _max_y)
 
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren)
 {	
-	Text_Object txt_o(_end_txt,
+	Text_Object txt_o(5,
 	                  "assets/fonts/DejaVuSansMono.ttf", 60,
 	                  SDL_Colour{0x30, 0x80, 0xf0, 0x00},
 	                  _ren,
 	                  SDL_Rect{0,0});
+
+	txt_o.set_text_ln(0, _end_txt);
+	txt_o.redraw();
 
 	txt_o.render_stretched();
 }
