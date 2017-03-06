@@ -344,21 +344,29 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 {
 	vector<Text_Object*> text(2);
 	string def_font_path = "assets/fonts/DejaVuSansMono.ttf";
-	text[0] = new Text_Object(5,
-	                      def_font_path, 36,
-	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
-	                      _ren,
-	                      SDL_Rect{200, 100});
-	text[1] = new Text_Object(5,
-	                      def_font_path, 18,
-	                      SDL_Colour{0x80, 0x00, 0x00, 0x00},
-	                      _ren,
-	                      SDL_Rect{200, 150});
+	text[0] = new Text_Object(5, def_font_path, 36
+	                         , SDL_Colour{0x80, 0x00, 0x00, 0x00}
+	                         , _ren
+	                         , SDL_Rect{200, 100});
+	text[1] = new Text_Object(5, def_font_path, 18
+	                         , SDL_Colour{0x80, 0x00, 0x00, 0x00}
+	                         , _ren
+	                         , SDL_Rect{200, 150});
+	text[2] = new Text_Object(5, def_font_path, 18
+	                         , SDL_Colour{0x80, 0x00, 0x00, 0x00}
+	                         , _ren
+	                         , SDL_Rect{200, 200});
 
 	text[0]->set_text_ln(0, "GAME OVER");
 	text[0]->redraw();
-	text[1]->set_text_ln(0, "space for a scoreboard here ;)");
+	text[1]->set_text_ln(0, "Top 5 players (TODO - make it 10)");
 	text[1]->redraw();
+	if(text[2]->load_file("data/scoreboard") < 0) {
+		cerr << "WARNING: Could not read scoreboard data\n";
+	}
+	else {
+		text[2]->redraw();
+	}
 
 	unsigned short linenum = 10;
 	int lines_ay[linenum];
@@ -401,6 +409,7 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 
 		text[0]->render();
 		text[1]->render();
+		text[2]->render();
 		
 		SDL_RenderPresent(_ren);
 		SDL_Delay(30);

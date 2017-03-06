@@ -9,6 +9,7 @@ Text_Object::Text_Object(int _line_sep,
 , m_col(_col)
 , m_font(NULL)
 , m_ren(_ren)
+, m_txt(new vector<string>)
 , m_line_sep(_line_sep)
 {
 	m_font = TTF_OpenFont(_fnt_path.c_str(), _fnt_size);
@@ -40,27 +41,33 @@ void Text_Object::render_stretched(SDL_Rect* _rec) //defaults to NULL
 
 void Text_Object::redraw()
 {
-	m_tex = make_txt_tex(m_text, m_font, m_col, m_ren);
+	m_tex = this->make_txt_tex(m_txt, m_font, m_col, m_ren);
 	int w, h;
 	SDL_QueryTexture(m_tex, NULL, NULL, &w, &h);
 	m_rect.w = w;
 	m_rect.h = h;
 }
 
+void Text_Object::set_text(vector<string>* _txt)
+{
+	delete m_txt;
+	m_txt = _txt;
+}
+
 void Text_Object::set_text_ln(unsigned _ln, const string& _s)
 {
-	while(_ln >= m_text.size()) {
-		m_text.push_back(" ");
+	while(_ln >= m_txt->size()) {
+		m_txt->push_back(" ");
 	}
 
-	m_text[_ln] = _s;
+	(*m_txt)[_ln] = _s;
 }
 
 void Text_Object::set_x(int _x) {m_rect.x = _x;}
 void Text_Object::set_y(int _y) {m_rect.y = _y;}
 void Text_Object::set_xy(int _x, int _y) {m_rect.x = _x; m_rect.y = _y;}
 
-SDL_Texture* Text_Object::make_txt_tex(const vector<string>& _t,
+SDL_Texture* Text_Object::make_txt_tex(vector<string>* _t,
              TTF_Font* _fnt,
 	         SDL_Color _col, SDL_Renderer* _ren)
 {
@@ -69,8 +76,18 @@ SDL_Texture* Text_Object::make_txt_tex(const vector<string>& _t,
 	vector<SDL_Texture*> texs; //TODO declare with overhead specified
 	vector<SDL_Rect> rects;
 
-	for(int i = 0; i < _t.size(); ++i) {
-		SDL_Surface* txt_surf = TTF_RenderText_Solid(_fnt, _t[i].c_str(), _col);
+	if(_t->size() == 0) {
+		cerr << "ERROR: Can not reender text, array is empty\n.";
+		return NULL;
+	}
+
+	for(int i = 0; i < _t->size(); ++i) {
+		if((*_t)[i].size() == 0) {
+			cerr << "ERROR: Can not render text, string is empty\n";
+			return NULL;
+		}
+
+		SDL_Surface* txt_surf = TTF_RenderText_Solid(_fnt, (*_t)[i].c_str(), _col);
 		if(txt_surf == NULL) {
 			cerr << "ERROR: unable to render text surface\n";
 			cerr << "SDL_ttf error: " << TTF_GetError() << endl;
@@ -95,7 +112,7 @@ SDL_Texture* Text_Object::make_txt_tex(const vector<string>& _t,
 
 	//TODO destroy unused textures
 
-	int final_h = ((line_h + m_line_sep) * _t.size()) - m_line_sep;
+	int final_h = ((line_h + m_line_sep) * _t->size()) - m_line_sep;
 	SDL_Texture* final_tex = SDL_CreateTexture(_ren, SDL_PIXELFORMAT_RGBA8888
 	             , SDL_TEXTUREACCESS_TARGET
 	             , line_max_w, final_h);
@@ -112,4 +129,29 @@ SDL_Texture* Text_Object::make_txt_tex(const vector<string>& _t,
 	SDL_SetRenderTarget(_ren, NULL);
 
 	return final_tex;
+}
+
+int Text_Object::load_file(const string& _fname)
+{
+	while(m_txt->size() > 0) {
+		m_txt->pop_back();
+	}
+
+	ifstream in_f(_fname);
+	if(!in_f.is_open()) {
+		cerr << "could not open file for writing: " << _fname << endl;
+		return -1;
+	}
+
+	while(!in_f.eof()) {
+		string buff;
+		getline(in_f, buff);
+
+		if(in_f.eof()) {continue;}
+		m_txt->push_back(buff);
+	}
+
+	in_f.close();
+
+	return 0;
 }
