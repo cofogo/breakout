@@ -10,6 +10,9 @@ using std::string;
 using std::to_string;
 #include <memory>
 using std::shared_ptr;
+#include <fstream>
+using std::ifstream;
+using std::ofstream;
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -35,6 +38,7 @@ SDL_Texture* load_texture(const string& _path, SDL_Renderer* _ren);
 vector<shared_ptr<SDL_Texture>> load_textures(SDL_Renderer* _ren);
 void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
               vector<shared_ptr<SDL_Texture>>* _texs);
+void save_score(int _score, string _name = "player");
 void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h);
 int check_loss(SDL_Rect* _r, const int _max_h);
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
@@ -320,6 +324,9 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			cout << "final score: " << score0 << endl;
 			load_endgame_screen(endgame_txt, _ren);
 			SDL_RenderPresent(_ren);
+
+			save_score(score0);
+
 			SDL_Delay(1000); //wait a sec
 			break;
 		}
@@ -337,6 +344,55 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			}
 		}
 	}
+}
+
+void save_score(int _score, string _name) //default: _name = "player"
+{
+	char sep = ';';
+	unsigned max_entries = 10;
+	string line;
+	ifstream inp("data/scoreboard");	
+	vector<string> lines;
+	
+	while(!inp.eof()) {
+		getline(inp, line);
+		if(!inp.eof()) {lines.push_back(line);}
+	}
+
+	inp.close();
+
+	ofstream out("data/scoreboard");
+	bool saved = false;
+	if(lines.size() > 0) {
+		for(unsigned i = 0; i < lines.size(); ++i) {
+			size_t pos = lines[i].find(sep);
+			if(pos == string::npos) {continue;}
+			string player = lines[i].substr(0, sep - 1);
+			string score_str = lines[i].substr(sep + 1);
+			int score = stoi(score_str);
+
+			if(_score > score && saved == false) {
+				saved = true;
+				out << _name << sep << _score << endl;
+				if(lines.size() >= max_entries) {
+					lines.pop_back();
+					--i;
+				}
+			}
+			else {
+				cerr << "saving: " << lines[i] << endl;
+				out << lines[i] << endl;
+			}
+		}
+	}
+	else {
+		out << _name << sep << _score << endl;
+		saved = true;
+	}
+
+	out.close();
+
+	if(saved) {cout << "New highscore, congratulations!\n";}
 }
 
 //TODO polish the animation closer to the end of the project
