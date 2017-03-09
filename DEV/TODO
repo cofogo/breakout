@@ -50,10 +50,10 @@ TODO - cofogo
 - [x] 03-01 add error handling when opening fonts (e.g. open fornts from Text_Object)
 - [x] 03-01 move text_to_texture to Text_Object
 - [x] 03-02 respawn bricks when all are gone
-- [ ] 03-03 implement a scoreboard (overlay on the game over animation :))
-- [ ] 03-10 collision engine - review, move into a separate module
-- [ ] 03-11 collision engine - untangle colission detection from colission reaction
-- [ ] 03-15 collision engine - multiple collisions per frame
+- [x] 03-09 implement a scoreboard (overlay on the game over animation :))
+- [ ] 03-16 collision engine - review, move into a separate module
+- [ ] 03-17 collision engine - untangle collision detection from colission reaction
+- [ ] 03-21 collision engine - multiple collisions per frame
 
 TODO - luke1222
 ===============

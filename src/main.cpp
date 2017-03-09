@@ -348,51 +348,45 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 void save_score(int _score, string _name) //default: _name = "player"
 {
-	char sep = ';';
+	bool new_hi = false;
 	unsigned max_entries = 10;
+	string sep = ";";
 	string line;
 	ifstream inp("data/scoreboard");	
 	vector<string> lines;
 	
-	while(!inp.eof()) {
+	for(unsigned i = 0; !inp.eof() && i < max_entries; ++i) {
 		getline(inp, line);
-		if(!inp.eof()) {lines.push_back(line);}
+		if(inp.eof()) {break;}
+
+		size_t pos = line.find(sep);
+		if(pos == string::npos) {continue;}
+
+		string name = line.substr(0, pos - 1);
+		int score = stoi(line.substr(pos + 1));
+
+		if(score <= _score && !new_hi) {
+			lines.push_back(_name + sep + to_string(_score));
+			new_hi = true;
+			++i;
+		}
+		if(lines.size() < max_entries) {lines.push_back(line);}
 	}
 
 	inp.close();
 
-	ofstream out("data/scoreboard");
-	bool saved = false;
-	if(lines.size() > 0) {
-		for(unsigned i = 0; i < lines.size(); ++i) {
-			size_t pos = lines[i].find(sep);
-			if(pos == string::npos) {continue;}
-			string player = lines[i].substr(0, sep - 1);
-			string score_str = lines[i].substr(sep + 1);
-			int score = stoi(score_str);
-
-			if(_score > score && saved == false) {
-				saved = true;
-				out << _name << sep << _score << endl;
-				if(lines.size() >= max_entries) {
-					lines.pop_back();
-					--i;
-				}
-			}
-			else {
-				cerr << "saving: " << lines[i] << endl;
-				out << lines[i] << endl;
-			}
-		}
+	if(!new_hi && lines.size() < max_entries) {
+		lines.push_back(_name + sep + to_string(_score));
 	}
-	else {
-		out << _name << sep << _score << endl;
-		saved = true;
+
+	ofstream out("data/scoreboard");
+	for(unsigned i = 0; i < lines.size(); ++i) {
+		out << lines[i] << endl;
 	}
 
 	out.close();
 
-	if(saved) {cout << "New highscore, congratulations!\n";}
+	if(new_hi) {cout << "New highscore, congratulations!\n";}
 }
 
 //TODO polish the animation closer to the end of the project
@@ -415,7 +409,7 @@ void outro(SDL_Renderer* _ren, const int _win_w, const int _win_h)
 
 	text[0]->set_text_ln(0, "GAME OVER");
 	text[0]->redraw();
-	text[1]->set_text_ln(0, "Top 5 players (TODO - make it 10)");
+	text[1]->set_text_ln(0, "The Top 10 players so far!");
 	text[1]->redraw();
 	if(text[2]->load_file("data/scoreboard") < 0) {
 		cerr << "WARNING: Could not read scoreboard data\n";
