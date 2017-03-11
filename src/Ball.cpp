@@ -64,7 +64,7 @@ void Ball::change_dir(short _angle)
 //TODO move collision, score, etc logic separatly. 'Cause spaghetti
 //TODO unify collision handling to all box objects and fix the madness
 void Ball::update(short _x_max, short _y_max,
-     vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r,
+     SDL_Rect* _obst, SDL_Rect* _paddle0_r,
 	 int& _score0)
 {
 	int left = m_rect.x;
@@ -93,59 +93,45 @@ void Ball::update(short _x_max, short _y_max,
 		}
 	}
 
-	//check for and handle collisions
-	for(unsigned i = 0; i < _obsts->size(); ++i) {
-		int obst_left = (*_obsts)[i]->get_rect()->x;
-		int obst_right = (*_obsts)[i]->get_rect()->x
-		               + (*_obsts)[i]->get_rect()->w;
-		int obst_top = (*_obsts)[i]->get_rect()->y;
-		int obst_bot = (*_obsts)[i]->get_rect()->y
-		             + (*_obsts)[i]->get_rect()->h;
-		int obst_w = (*_obsts)[i]->get_rect()->w;
-		int obst_h = (*_obsts)[i]->get_rect()->h;
-		int obst_cen_x = (*_obsts)[i]->get_rect()->x
-		               + ((*_obsts)[i]->get_rect()->w / 2);
-		int obst_cen_y = (*_obsts)[i]->get_rect()->y
-		               + ((*_obsts)[i]->get_rect()->h / 2);
+	//react to collision
+	if(_obst != NULL) {
+		//collision - have to find direction change
+		cerr << "Collision!\n";
 
-		if(left > obst_right
-		|| right < obst_left
-		|| top > obst_bot
-		|| bot < obst_top
-		) { // no collision
-		}
-		//TODO move collision reaction to a separate function, for clarity
-		//TODO (later) rethink colission reaction code, there must be a more elegant, but readable solution
-		else {
-			//collision - have to find direction change
-			cerr << "Collision!\n";
+		//TODO the below clarity assignments are probs redundant now
+		int obst_left = _obst->x;
+		int obst_right = _obst->x
+					   + _obst->w;
+		int obst_top = _obst->y;
+		int obst_bot = _obst->y
+					 + _obst->h;
+		int obst_w = _obst->w;
+		int obst_h = _obst->h;
+		int obst_cen_x = _obst->x
+					   + (_obst->w / 2);
+		cerr << "ocx: " << obst_cen_x << endl;
+		int obst_cen_y = _obst->y
+					   + (_obst->h / 2);
 
-			//updating combo and score values
-			m_combo += 0.1d;
-			m_score += 100;
+		//updating combo and score values
+		m_combo += 0.1d;
+		m_score += 100;
 
-			//TODO move brick destruction to where it belongs
-			//destroy brick
-			(*_obsts)[i] = _obsts->back();
-			(*_obsts).pop_back();
-			
-			double prev_cen_x = (double)cen_x - (m_dx * m_total_speed);
-			double prev_cen_y = (double)cen_y - (m_dy * m_total_speed);
-			//calculate distance between walls on x and y axes
-			double dist_x = fabs(prev_cen_x - obst_cen_x)
-			              - (obst_w/2) - (m_rect.w/2);
-			double dist_y = fabs(prev_cen_y - obst_cen_y)
-			              - (obst_h/2) - (m_rect.h/2);
+		double prev_cen_x = (double)cen_x - (m_dx * m_total_speed);
+		double prev_cen_y = (double)cen_y - (m_dy * m_total_speed);
+		//calculate distance between walls on x and y axes
+		double dist_x = fabs(prev_cen_x - obst_cen_x)
+					  - (obst_w/2) - (m_rect.w/2);
+		double dist_y = fabs(prev_cen_y - obst_cen_y)
+					  - (obst_h/2) - (m_rect.h/2);
 
-			//for debug
-			cerr << "prev cen x/y: " << prev_cen_x << "/" << prev_cen_y << endl;
-			cerr << "curr o_c x/y: " << obst_cen_x << "/" << obst_cen_y << endl;
-			cerr << "curr dst x/y: " << dist_x << "/" << dist_y << endl;
+		//for debug
+		cerr << "prev cen x/y: " << prev_cen_x << "/" << prev_cen_y << endl;
+		cerr << "curr o_c x/y: " << obst_cen_x << "/" << obst_cen_y << endl;
+		cerr << "curr dst x/y: " << dist_x << "/" << dist_y << endl;
 
-			//if dist is negative, collision must have not happened on that axis
-			if(dist_x < 0) {m_dy *= -1; break;}
-			if(dist_y < 0) {m_dx *= -1; break;}
-
+		//if dist is negative, collision must have not happened on that axis
+		if(dist_x > 0 && dist_y > 0) {
 			/* if relatively closer to x, collision happened on x
 			 * and vice versa. If both are equal, both directions flip. */
 			double relative_dist_x = dist_x / fabs(m_dx * m_total_speed);
@@ -162,7 +148,7 @@ void Ball::update(short _x_max, short _y_max,
 				cerr << "Y flip ";
 			}
 			cerr << "rel_d_x/rel_d_y: " << relative_dist_x
-			     << "/" << relative_dist_y << endl;
+				 << "/" << relative_dist_y << endl;
 			cerr << "qdx/qdy: " << m_dx << "/" << m_dy << endl;
 
 			//moving the ball to colission point
@@ -191,6 +177,10 @@ void Ball::update(short _x_max, short _y_max,
 			m_rect.y = m_real_y += m_dy * trans_rem;
 
 			return;
+		}
+		else {
+			if(dist_x < 0) {m_dy *= -1;}
+			if(dist_y < 0) {m_dx *= -1;}
 		}
 	}
 

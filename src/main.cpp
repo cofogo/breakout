@@ -44,6 +44,7 @@ int check_loss(SDL_Rect* _r, const int _max_h);
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
 void make_bricks(vector<shared_ptr<Brick>>& _bricks,
                  shared_ptr<SDL_Texture> _tex);
+char coll_detect(SDL_Rect* _a, SDL_Rect* _b); //did _a hit _b?
 
 int main(int argc, char* args[])
 {
@@ -269,7 +270,31 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		}
 
 		int old_score0 = score0;
-		ball.update(win_w, win_h, &bricks, paddle0.get_rect(), score0);
+
+		unsigned hit_brick_id = -1;
+		SDL_Rect* hit_brick_rect = NULL;
+		for(unsigned i = 0; i < bricks.size(); ++i) {
+			if(coll_detect(ball.get_rect(), bricks[i]->get_rect()) != 0) {
+				hit_brick_id = i;
+				cerr << "hit brick: " << hit_brick_id << endl;
+				hit_brick_rect = bricks[i]->get_rect();
+
+			cerr << "hbr x/y/w/h: "
+				 << hit_brick_rect->x << "/"
+				 << hit_brick_rect->y << "/"
+				 << hit_brick_rect->w << "/"
+				 << hit_brick_rect->h << endl;
+
+				break;
+			}
+		}
+
+		ball.update(win_w, win_h, hit_brick_rect, paddle0.get_rect(), score0);
+		if(hit_brick_id <= bricks.size()) {
+			bricks[hit_brick_id] = bricks.back();
+			bricks.pop_back();
+		}
+
 		if(check_loss(ball.get_rect(), win_h)) {
 			//if ball lost, decrement lives, end game if lives == 0
 			if(--lives0 == 0) {
@@ -277,7 +302,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 				endgame_txt = "GAME OVER!";
 				cout << endgame_txt << "\nTRY AGAIN ;)\n";
 			}
-			cerr << "lives: " << lives0 << endl; //TODO print lives on GUI
+			cerr << "lives: " << lives0 << endl;
 			lives0_txt.set_text_ln(0, "LIVES: " + to_string(lives0));
 			lives0_txt.redraw();
 			ball = Ball(SDL_Rect{400, 300}, 9, 45);
@@ -531,5 +556,21 @@ void make_bricks(vector<shared_ptr<Brick>>& _bricks,
 
 	for(unsigned short i = 0; i < _bricks.size(); ++i) {
 		_bricks[i]->assign_texture(_tex);
+	}
+}
+
+char coll_detect(SDL_Rect* _a, SDL_Rect* _b)
+{
+	if(_a->x > _b->x + _b->w
+	|| _a->x + _a->w < _b->x
+	|| _a->y > _b->y + _b->h
+	|| _a->y + _a->h < _b->y
+	) {
+		return 0;
+	}
+
+	//TODO return collision direction (1,2, 3, 4, 5, 6, 7, 8, 9)
+	else {
+		return 1;
 	}
 }

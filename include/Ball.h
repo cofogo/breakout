@@ -20,7 +20,7 @@ public:
 	~Ball();
 	
 	void update(short _x_max, short _y_max,
-	     vector<shared_ptr<Brick>>* _obsts, SDL_Rect* _paddle0_r,
+	     SDL_Rect* _obst, SDL_Rect* _paddle0_r,
 	     int& _score0);
 	void change_dir(short _angle);
 	void set_xy(double _x, double _y);
