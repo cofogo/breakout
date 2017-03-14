@@ -290,6 +290,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		}
 
 		ball.update(win_w, win_h, hit_brick_rect, paddle0.get_rect(), score0);
+		//if brick id is set - collision happened. Destroy that brick.
 		if(hit_brick_id <= bricks.size()) {
 			bricks[hit_brick_id] = bricks.back();
 			bricks.pop_back();
@@ -569,7 +570,6 @@ char coll_detect(SDL_Rect* _a, SDL_Rect* _b)
 		return 0;
 	}
 
-	//TODO return collision direction (1,2, 3, 4, 5, 6, 7, 8, 9)
 	else {
 		return 1;
 	}

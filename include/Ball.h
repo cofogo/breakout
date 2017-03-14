@@ -23,7 +23,9 @@ public:
 	     SDL_Rect* _obst, SDL_Rect* _paddle0_r,
 	     int& _score0);
 	void change_dir(short _angle);
+	void coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst);
 	void set_xy(double _x, double _y);
+
 private:
 	short m_total_speed;
 	short m_vector_angle;
