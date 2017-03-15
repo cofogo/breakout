@@ -19,6 +19,7 @@ using std::ofstream;
 #include <SDL2/SDL_ttf.h>
 
 #include "utils.h"
+using utils::vec2;
 #include "Timer.h"
 #include "Paddle.h"
 #include "Ball.h"
@@ -204,7 +205,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 	Paddle paddle0(SDL_Rect{300, 600}, 7);
 	
-	Ball ball(SDL_Rect{400, 300}, 9, 45);
+	Ball ball(SDL_Rect{400, 300}, 9, vec2{0.5d, 0.5d});
 	vector<shared_ptr<Brick>> bricks;
 	make_bricks(bricks, (*_texs)[2]);
 	
@@ -306,7 +307,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 			cerr << "lives: " << lives0 << endl;
 			lives0_txt.set_text_ln(0, "LIVES: " + to_string(lives0));
 			lives0_txt.redraw();
-			ball = Ball(SDL_Rect{400, 300}, 9, 45);
+			ball = Ball(SDL_Rect{400, 300}, 9, vec2{0.5d, 0.5d});
 			ball.assign_texture((*_texs)[1]);
 		}
 
@@ -317,7 +318,7 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 		//if all bricks are gone, make a new array when ball is close to paddle
 		if(bricks.size() == 0) {
-			ball = Ball(SDL_Rect{400, 300}, 9, 45);
+			ball = Ball(SDL_Rect{400, 300}, 9, vec2{0.5d, 0.5d});
 			ball.assign_texture((*_texs)[1]);
 			make_bricks(bricks, (*_texs)[2]);
 		}
