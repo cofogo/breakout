@@ -32,7 +32,7 @@ private:
 	short m_total_speed;
 	short m_vector_angle;
 	vec2 m_dir;
-	double m_real_x, m_real_y;
+	vec2 m_pos;
 	int m_score;
 	double m_combo;
 };

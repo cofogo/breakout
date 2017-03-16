@@ -4,8 +4,7 @@ Ball::Ball(SDL_Rect _rect, short _spd, const vec2& _dir)
 : Object(_rect)
 , m_total_speed(_spd)
 , m_dir(_dir)
-, m_real_x(_rect.x)
-, m_real_y(_rect.y)
+, m_pos(vec2{double(_rect.x), double(_rect.y)})
 , m_score(0)
 , m_combo(0.0d)
 {
@@ -92,8 +91,8 @@ void Ball::update(short _x_max, short _y_max,
 
 	//moving the ball
 	//NOTE a bit inefficient
-	m_rect.x = m_real_x += m_dir.x * m_total_speed;
-	m_rect.y = m_real_y += m_dir.y * m_total_speed;
+	m_rect.x = m_pos.x += m_dir.x * m_total_speed;
+	m_rect.y = m_pos.y += m_dir.y * m_total_speed;
 }
 
 void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
@@ -156,25 +155,25 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 		if(dist_x > 0) {
 			trans_rem -= dist_x;
 			if(m_dir.y > 0) {
-				m_rect.x = m_real_x += dist_x;
+				m_rect.x = m_pos.x += dist_x;
 			}
 			else {
-				m_rect.x = m_real_x -= dist_x;
+				m_rect.x = m_pos.x -= dist_x;
 			}
 		}
 		if(dist_y > 0) {
 			trans_rem -= dist_y;
 			if(m_dir.y > 0) {
-				m_rect.y = m_real_y += dist_y;
+				m_rect.y = m_pos.y += dist_y;
 			}
 			else {
-				m_rect.y = m_real_y -= dist_y;
+				m_rect.y = m_pos.y -= dist_y;
 			}
 		}
 		
 		//moving the ball with energy remaining after impact
-		m_rect.x = m_real_x += m_dir.x * trans_rem;
-		m_rect.y = m_real_y += m_dir.y * trans_rem;
+		m_rect.x = m_pos.x += m_dir.x * trans_rem;
+		m_rect.y = m_pos.y += m_dir.y * trans_rem;
 
 		return;
 	}
@@ -184,4 +183,4 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 	}
 }
 
-void Ball::set_xy(double _x, double _y) {m_real_x = _x; m_real_y = _y;}
+void Ball::set_xy(double _x, double _y) {m_pos.x = _x; m_pos.y = _y;}
