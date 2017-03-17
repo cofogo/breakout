@@ -27,9 +27,11 @@ public:
 	void set_dir(const vec2& _dir);
 	void coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst);
 	void set_xy(double _x, double _y);
+	short get_speed();
+	vec2 get_dir();
 
 private:
-	short m_total_speed;
+	short m_speed;
 	short m_vector_angle;
 	vec2 m_dir;
 	vec2 m_pos;

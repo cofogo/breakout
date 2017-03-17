@@ -46,6 +46,7 @@ void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
 void make_bricks(vector<shared_ptr<Brick>>& _bricks,
                  shared_ptr<SDL_Texture> _tex);
 char coll_detect(SDL_Rect* _a, SDL_Rect* _b); //did _a hit _b?
+char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b);
 
 int main(int argc, char* args[])
 {
@@ -285,6 +286,9 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 				 << hit_brick_rect->y << "/"
 				 << hit_brick_rect->w << "/"
 				 << hit_brick_rect->h << endl;
+
+				char tmp = coll_detect_new(ball.get_rect(), ball.get_speed(), ball.get_dir(), bricks[i]->get_rect());
+				cerr << "new coll det: " << tmp << endl;
 
 				break;
 			}
@@ -576,71 +580,69 @@ char coll_detect(SDL_Rect* _a, SDL_Rect* _b)
 	}
 }
 
-//char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
-//{
-//	if(_a->x > _b->x + _b->w
-//	|| _a->x + _a->w < _b->x
-//	|| _a->y > _b->y + _b->h
-//	|| _a->y + _a->h < _b->y
-//	) {
-//		return 0;
-//	}
-//
-//	else {
-//		//TODO the below clarity assignments are probs redundant now
-//		int obst_left = _b->x;
-//		int obst_right = _b->x
-//					   + _b->w;
-//		int obst_top = _b->y;
-//		int obst_bot = _b->y
-//					 + _b->h;
-//		int obst_w = _b->w;
-//		int obst_h = _b->h;
-//		int obst_cen_x = _b->x
-//					   + (_b->w / 2);
-//		cerr << "ocx: " << obst_cen_x << endl;
-//		int obst_cen_y = _b->y
-//					   + (_b->h / 2);
-//
-//		double prev_cen_x = (double)_cen_x - (_a_dir.x * _a_spd);
-//		double prev_cen_y = (double)_cen_y - (_a_dir.y * _a_spd);
-//		//calculate distance between walls on x and y axes
-//		double dist_x = fabs(prev_cen_x - obst_cen_x)
-//					  - (obst_w/2) - (_a->w/2);
-//		double dist_y = fabs(prev_cen_y - obst_cen_y)
-//					  - (obst_h/2) - (_a->h/2);
-//
-//		//for debug
-//		cerr << "prev cen x/y: " << prev_cen_x << "/" << prev_cen_y << endl;
-//		cerr << "curr o_c x/y: " << obst_cen_x << "/" << obst_cen_y << endl;
-//		cerr << "curr dst x/y: " << dist_x << "/" << dist_y << endl;
-//
-//		//if dist is negative, collision must have not happened on that axis
-//		if(dist_x > 0 && dist_y > 0) {
-//			/* if relatively closer to x, collision happened on x
-//			 * and vice versa. If both are equal, both directions flip. */
-//			double relative_dist_x = dist_x / fabs(_a_dir.x * _a_spd);
-//			double relative_dist_y = dist_y / fabs(_a_dir.y * _a_spd);
-//
-//			if(relative_dist_x <= relative_dist_y) {
-//				//collision with vertical wall
-//				rerutn 'v';
-//			}
-//			if(relative_dist_y <= relative_dist_x) {
-//				//collision with horizontal wall
-//				return 'h';
-//			}
-//			cerr << "rel_d_x/rel_d_y: " << relative_dist_x
-//				 << "/" << relative_dist_y << endl;
-//			cerr << "qdx/qdy: " << _a_dir.x << "/" << _a_dir.y << endl;
-//			
-//			return;
-//		}
-//		else {
-//			if(dist_x < 0) {return 'v';}
-//			if(dist_y < 0) {return 'h';}
-//		}
-//
-//		return 1;
-//	}
-//}
+char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
+{
+	if(_a->x > _b->x + _b->w
+	|| _a->x + _a->w < _b->x
+	|| _a->y > _b->y + _b->h
+	|| _a->y + _a->h < _b->y
+	) {
+		return 0;
+	}
+
+	else {
+		//TODO the below clarity assignments are probs redundant now
+		int cen_x = _a->x + (_a->w / 2);
+		int cen_y = _a->y + (_a->h / 2);
+		int obst_left = _b->x;
+		int obst_right = _b->x
+					   + _b->w;
+		int obst_top = _b->y;
+		int obst_bot = _b->y
+					 + _b->h;
+		int obst_w = _b->w;
+		int obst_h = _b->h;
+		int obst_cen_x = _b->x
+					   + (_b->w / 2);
+		cerr << "ocx: " << obst_cen_x << endl;
+		int obst_cen_y = _b->y
+					   + (_b->h / 2);
+
+		double prev_cen_x = (double)cen_x - (_a_dir.x * _a_spd);
+		double prev_cen_y = (double)cen_y - (_a_dir.y * _a_spd);
+		//calculate distance between walls on x and y axes
+		double dist_x = fabs(prev_cen_x - obst_cen_x)
+					  - (obst_w/2) - (_a->w/2);
+		double dist_y = fabs(prev_cen_y - obst_cen_y)
+					  - (obst_h/2) - (_a->h/2);
+
+		//for debug
+		cerr << "prev cen x/y: " << prev_cen_x << "/" << prev_cen_y << endl;
+		cerr << "curr o_c x/y: " << obst_cen_x << "/" << obst_cen_y << endl;
+		cerr << "curr dst x/y: " << dist_x << "/" << dist_y << endl;
+
+		//if dist is negative, collision must have not happened on that axis
+		if(dist_x < 0 && dist_y < 0) {return 'c';}
+		else if(dist_x < 0) {return 'h';}
+		else if(dist_y < 0) {return 'v';}
+		else if(dist_x > 0 && dist_y > 0) {
+			/* if relatively closer to x, collision happened on x
+			 * and vice versa. If both are equal, both directions flip. */
+			double relative_dist_x = dist_x / fabs(_a_dir.x * _a_spd);
+			double relative_dist_y = dist_y / fabs(_a_dir.y * _a_spd);
+
+			if(relative_dist_x < relative_dist_y) {
+				//collision with vertical wall
+				return 'v';
+			}
+			else if(relative_dist_y < relative_dist_x) {
+				//collision with horizontal wall
+				return 'h';
+			}
+			else if(relative_dist_y = relative_dist_x) {
+				//collision with horizontal wall
+				return 'c';
+			}
+		}
+	}
+}

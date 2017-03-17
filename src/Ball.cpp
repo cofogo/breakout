@@ -2,7 +2,7 @@
 
 Ball::Ball(SDL_Rect _rect, short _spd, const vec2& _dir)
 : Object(_rect)
-, m_total_speed(_spd)
+, m_speed(_spd)
 , m_dir(_dir)
 , m_pos(vec2{double(_rect.x), double(_rect.y)})
 , m_score(0)
@@ -91,8 +91,8 @@ void Ball::update(short _x_max, short _y_max,
 
 	//moving the ball
 	//NOTE a bit inefficient
-	m_rect.x = m_pos.x += m_dir.x * m_total_speed;
-	m_rect.y = m_pos.y += m_dir.y * m_total_speed;
+	m_rect.x = m_pos.x += m_dir.x * m_speed;
+	m_rect.y = m_pos.y += m_dir.y * m_speed;
 }
 
 void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
@@ -116,8 +116,8 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 	m_combo += 0.1d;
 	m_score += 100;
 
-	double prev_cen_x = (double)_cen_x - (m_dir.x * m_total_speed);
-	double prev_cen_y = (double)_cen_y - (m_dir.y * m_total_speed);
+	double prev_cen_x = (double)_cen_x - (m_dir.x * m_speed);
+	double prev_cen_y = (double)_cen_y - (m_dir.y * m_speed);
 	//calculate distance between walls on x and y axes
 	double dist_x = fabs(prev_cen_x - obst_cen_x)
 				  - (obst_w/2) - (m_rect.w/2);
@@ -133,8 +133,8 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 	if(dist_x > 0 && dist_y > 0) {
 		/* if relatively closer to x, collision happened on x
 		 * and vice versa. If both are equal, both directions flip. */
-		double relative_dist_x = dist_x / fabs(m_dir.x * m_total_speed);
-		double relative_dist_y = dist_y / fabs(m_dir.y * m_total_speed);
+		double relative_dist_x = dist_x / fabs(m_dir.x * m_speed);
+		double relative_dist_y = dist_y / fabs(m_dir.y * m_speed);
 
 		if(relative_dist_x <= relative_dist_y) {
 			//vertical collision
@@ -151,7 +151,7 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 		cerr << "qdx/qdy: " << m_dir.x << "/" << m_dir.y << endl;
 
 		//moving the ball to colission point
-		double trans_rem = m_total_speed;
+		double trans_rem = m_speed;
 		if(dist_x > 0) {
 			trans_rem -= dist_x;
 			if(m_dir.y > 0) {
@@ -184,3 +184,6 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 }
 
 void Ball::set_xy(double _x, double _y) {m_pos.x = _x; m_pos.y = _y;}
+
+short Ball::get_speed() {return m_speed;}
+vec2 Ball::get_dir() {return m_dir;}
