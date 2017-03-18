@@ -20,6 +20,7 @@ using std::ofstream;
 
 #include "utils.h"
 using utils::vec2;
+using utils::coll_data;
 #include "Timer.h"
 #include "Paddle.h"
 #include "Ball.h"
@@ -46,7 +47,7 @@ void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
 void make_bricks(vector<shared_ptr<Brick>>& _bricks,
                  shared_ptr<SDL_Texture> _tex);
 char coll_detect(SDL_Rect* _a, SDL_Rect* _b); //did _a hit _b?
-char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b);
+coll_data* coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b);
 
 int main(int argc, char* args[])
 {
@@ -281,14 +282,17 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 				cerr << "hit brick: " << hit_brick_id << endl;
 				hit_brick_rect = bricks[i]->get_rect();
 
-			cerr << "hbr x/y/w/h: "
-				 << hit_brick_rect->x << "/"
-				 << hit_brick_rect->y << "/"
-				 << hit_brick_rect->w << "/"
-				 << hit_brick_rect->h << endl;
+				cerr << "hbr x/y/w/h: "
+				<< hit_brick_rect->x << "/"
+				<< hit_brick_rect->y << "/"
+				<< hit_brick_rect->w << "/"
+				<< hit_brick_rect->h << endl;
 
-				char tmp = coll_detect_new(ball.get_rect(), ball.get_speed(), ball.get_dir(), bricks[i]->get_rect());
-				cerr << "new coll det: " << tmp << endl;
+				coll_data* tmp = coll_detect_new(ball.get_rect(),
+				                                ball.get_speed(),
+				                                ball.get_dir(),
+				                                bricks[i]->get_rect());
+				cerr << "new coll det: " << tmp->dir << " " << tmp->point.x << "/" << tmp->point.y << endl;
 
 				break;
 			}
@@ -580,14 +584,14 @@ char coll_detect(SDL_Rect* _a, SDL_Rect* _b)
 	}
 }
 
-char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
+coll_data* coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
 {
 	if(_a->x > _b->x + _b->w
 	|| _a->x + _a->w < _b->x
 	|| _a->y > _b->y + _b->h
 	|| _a->y + _a->h < _b->y
 	) {
-		return 0;
+		return NULL;
 	}
 
 	else {
@@ -608,6 +612,8 @@ char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
 		int obst_cen_y = _b->y
 					   + (_b->h / 2);
 
+		vec2 prev_pos = vec2{(double)_a->x - (_a_dir.x * _a_spd),
+		                     (double)_a->y - (_a_dir.y * _a_spd)};
 		double prev_cen_x = (double)cen_x - (_a_dir.x * _a_spd);
 		double prev_cen_y = (double)cen_y - (_a_dir.y * _a_spd);
 		//calculate distance between walls on x and y axes
@@ -621,28 +627,65 @@ char coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
 		cerr << "curr o_c x/y: " << obst_cen_x << "/" << obst_cen_y << endl;
 		cerr << "curr dst x/y: " << dist_x << "/" << dist_y << endl;
 
+		char coll_dir = 0;
+		double coll_point_x = 0.0d;
+		double coll_point_y = 0.0d;
 		//if dist is negative, collision must have not happened on that axis
-		if(dist_x < 0 && dist_y < 0) {return 'c';}
-		else if(dist_x < 0) {return 'h';}
-		else if(dist_y < 0) {return 'v';}
+		if(dist_x < 0 && dist_y < 0) {
+			coll_dir = 'c';
+
+			//as dist values are negative, the +/- ops are inverted
+			if(_a_dir.x > 0) {coll_point_x = prev_pos.x + dist_x;}
+			else {coll_point_x = prev_pos.x - dist_x;}
+
+			if(_a_dir.y > 0) {coll_point_y = prev_pos.y + dist_y;}
+			else {coll_point_y = prev_pos.y - dist_y;}
+		}
+		else if(dist_x < 0) {
+			coll_dir = 'h';
+			coll_point_y = (_a_dir.y > 0)? prev_pos.y + dist_y : prev_pos.y - dist_y;
+			double transl_perc = dist_y / (_a_dir.y * (double)_a_spd);
+			double x_transl = (_a_dir.x * (double)_a_spd) * transl_perc;
+			coll_point_x = prev_pos.x + x_transl;
+		}
+		else if(dist_y < 0) {
+			coll_dir = 'v';
+			coll_point_x = (_a_dir.x > 0)? prev_pos.x + dist_x : prev_pos.x - dist_x;
+			double transl_perc = dist_x / (_a_dir.x * (double)_a_spd);
+			double y_transl = (_a_dir.y * (double)_a_spd) * transl_perc;
+			coll_point_y = prev_pos.y + y_transl;
+		}
 		else if(dist_x > 0 && dist_y > 0) {
+			//TODO see how often this actually gets called and how it behaves
 			/* if relatively closer to x, collision happened on x
-			 * and vice versa. If both are equal, both directions flip. */
+			 * and vice versa. */
 			double relative_dist_x = dist_x / fabs(_a_dir.x * _a_spd);
 			double relative_dist_y = dist_y / fabs(_a_dir.y * _a_spd);
 
 			if(relative_dist_x < relative_dist_y) {
 				//collision with vertical wall
-				return 'v';
+				coll_dir = 'v';
 			}
 			else if(relative_dist_y < relative_dist_x) {
 				//collision with horizontal wall
-				return 'h';
+				coll_dir = 'h';
 			}
 			else if(relative_dist_y = relative_dist_x) {
-				//collision with horizontal wall
-				return 'c';
+				//collision on both axes
+				coll_dir = 'c';
 			}
+
+			coll_point_x = (_a_dir.x > 0)? prev_pos.x + dist_x : prev_pos.x - dist_x;
+			coll_point_y = (_a_dir.y > 0)? prev_pos.y + dist_y : prev_pos.y - dist_y;
 		}
+
+		cerr << "d_x:" << dist_x << " " << "a_x:" << _a->x << endl;
+		cerr << "d_y:" << dist_y << " " << "a_y:" << _a->y << endl;
+		cerr << "coll_point_x:" << coll_point_x << endl;
+		cerr << "coll_point_y:" << coll_point_y << endl;
+
+		vec2 coll_point = vec2{coll_point_x, coll_point_y};
+		//TODO use smart pointer
+		return new coll_data{coll_dir, coll_point};
 	}
 }

@@ -16,5 +16,10 @@ namespace utils {
 	struct vec2 {
 		double x, y;
 	};
+
+	struct coll_data {
+		char dir;
+		vec2 point;
+	};
 }
 #endif
