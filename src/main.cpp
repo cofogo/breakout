@@ -31,7 +31,7 @@ const int win_w = 800;
 const int win_h = 640;
 
 int init(); //initialise SDL
-int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
+int create_main_win(SDL_Window*& _win,
                     const int _w, const int _h);
 int create_win_renderer(SDL_Window* _win, SDL_Renderer*& _ren);
 void close(SDL_Window*& _win, SDL_Renderer*& _ren);
@@ -57,10 +57,9 @@ int main(int argc, char* args[])
 	}
 	
 	SDL_Window* win_main = NULL;
-	SDL_Surface* srf_main = NULL;
 	SDL_Renderer* ren_main = NULL;
 	
-	if(create_main_win(win_main, srf_main, win_w, win_h) != 0) {
+	if(create_main_win(win_main, win_w, win_h) != 0) {
 		close(win_main, ren_main);
 		return 1;
 	}
@@ -107,8 +106,8 @@ int init()
 	return 0;
 }
 
-int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
-										const int _w, const int _h)
+int create_main_win(SDL_Window*& _win,
+	                const int _w, const int _h)
 {
 	_win = SDL_CreateWindow("breakout42",
 	                        SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
@@ -119,8 +118,6 @@ int create_main_win(SDL_Window*& _win, SDL_Surface*& _srf,
 		cerr << "SDL error = " << SDL_GetError() << endl;
 		return 1;
 	}
-	
-	_srf = SDL_GetWindowSurface(_win);
 	
 	return 0;
 }
