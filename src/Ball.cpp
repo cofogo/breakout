@@ -27,6 +27,7 @@ void Ball::update(short _x_max, short _y_max,
 	int cen_x = m_rect.x + (m_rect.w / 2);
 	int cen_y = m_rect.y + (m_rect.h / 2);
 
+	//TODO below should probs be implemented differently
 	//in the future this flag will change depending on which player the ball
 	//belongs to
 	bool bott_death = true;	
@@ -181,6 +182,45 @@ void Ball::coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst)
 		if(dist_x < 0) {m_dir.y *= -1;}
 		if(dist_y < 0) {m_dir.x *= -1;}
 	}
+}
+
+void Ball::coll_react_new(char _dir, vec2 _coll_point)
+{
+	//changing direction due to rebound
+	if(_dir == 'v') {m_dir.x *= -1;}
+	else if(_dir == 'h') {m_dir.y *= -1;}
+	else if(_dir == 'c') {
+		m_dir.x *= -1;
+		m_dir.y *= -1;
+	}
+
+	//moving the ball to colission point
+	vec2 dist = vec2{fabs(m_pos.x - _coll_point.x), fabs(m_pos.y - _coll_point.y)};
+	double trans_rem = m_speed;
+	if(dist.x > 0) {
+		trans_rem -= dist.x;
+		if(m_dir.y > 0) {
+			m_rect.x = m_pos.x += dist.x;
+		}
+		else {
+			m_rect.x = m_pos.x -= dist.x;
+		}
+	}
+	if(dist.y > 0) {
+		trans_rem -= dist.y;
+		if(m_dir.y > 0) {
+			m_rect.y = m_pos.y += dist.y;
+		}
+		else {
+			m_rect.y = m_pos.y -= dist.y;
+		}
+	}
+	
+	//continue ball movement with energy remaining after impact
+	m_rect.x = m_pos.x += m_dir.x * trans_rem;
+	m_rect.y = m_pos.y += m_dir.y * trans_rem;
+
+	return;
 }
 
 void Ball::set_xy(double _x, double _y) {m_pos.x = _x; m_pos.y = _y;}
