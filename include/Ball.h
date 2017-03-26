@@ -12,6 +12,7 @@ using std::shared_ptr;
 
 #include "utils.h"
 using utils::vec2;
+using utils::coll_data;
 #include "Object.h"
 #include "Brick.h"
 
@@ -22,11 +23,10 @@ public:
 	~Ball();
 	
 	void update(short _x_max, short _y_max,
-	     SDL_Rect* _obst, SDL_Rect* _paddle0_r,
+	     SDL_Rect* _paddle0_r,
 	     int& _score0);
 	void set_dir(const vec2& _dir);
-	void coll_react(int _cen_x, int _cen_y, SDL_Rect* _obst);
-	void coll_react_new(char _dir, vec2 _coll_point);
+	void coll_react(coll_data* _coll);
 	void set_xy(double _x, double _y);
 	short get_speed();
 	vec2 get_dir();

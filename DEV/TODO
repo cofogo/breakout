@@ -53,8 +53,10 @@ TODO - cofogo
 - [x] 03-09 implement a scoreboard (overlay on the game over animation :))
 - [x] 03-11 collision engine - review, move into a separate module
 - [x] 03-14 collision engine - untangle collision detection from colission reaction
-- [ ] 03-15 collision engine - generalise collision detection more by returning collision direction
-- [ ] 03-17 collision engine - multiple collisions per frame
+- [x] 03-24 collision engine - generalise collision detection more by returning data
+- [x] 03-26 collision engine - move collisions to new framework and test
+- [ ] 03-29 collision engine - multiple collisions per frame
+- [ ] collision engine - solve issue: when colission should happen very close to another brick, sometimes wrong brick is returned by collision detection
 
 TODO - luke1222
 ===============

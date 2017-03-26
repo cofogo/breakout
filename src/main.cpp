@@ -46,8 +46,7 @@ int check_loss(SDL_Rect* _r, const int _max_h);
 void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren);
 void make_bricks(vector<shared_ptr<Brick>>& _bricks,
                  shared_ptr<SDL_Texture> _tex);
-char coll_detect(SDL_Rect* _a, SDL_Rect* _b); //did _a hit _b?
-coll_data* coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b);
+coll_data* coll_detect(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b);
 
 int main(int argc, char* args[])
 {
@@ -271,36 +270,20 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 		int old_score0 = score0;
 
-		unsigned hit_brick_id = -1;
-		SDL_Rect* hit_brick_rect = NULL;
+		//TODO return the closest brick on path, as the wrong brick sometimes gets hit when margins are small
 		for(unsigned i = 0; i < bricks.size(); ++i) {
-			if(coll_detect(ball.get_rect(), bricks[i]->get_rect()) != 0) {
-				hit_brick_id = i;
-				cerr << "hit brick: " << hit_brick_id << endl;
-				hit_brick_rect = bricks[i]->get_rect();
-
-				cerr << "hbr x/y/w/h: "
-				<< hit_brick_rect->x << "/"
-				<< hit_brick_rect->y << "/"
-				<< hit_brick_rect->w << "/"
-				<< hit_brick_rect->h << endl;
-
-				coll_data* tmp = coll_detect_new(ball.get_rect(),
-				                                ball.get_speed(),
-				                                ball.get_dir(),
-				                                bricks[i]->get_rect());
-				cerr << "new coll det: " << tmp->dir << " " << tmp->point.x << "/" << tmp->point.y << endl;
-
-				break;
+			coll_data* coll = coll_detect(ball.get_rect(), ball.get_speed()
+			                  , ball.get_dir()
+				              , bricks[i]->get_rect());
+			if(coll != NULL) {
+				ball.coll_react(coll);
+				bricks[i] = bricks.back();
+				bricks.pop_back();
+				delete coll;
 			}
 		}
 
-		ball.update(win_w, win_h, hit_brick_rect, paddle0.get_rect(), score0);
-		//if brick id is set - collision happened. Destroy that brick.
-		if(hit_brick_id <= bricks.size()) {
-			bricks[hit_brick_id] = bricks.back();
-			bricks.pop_back();
-		}
+		ball.update(win_w, win_h, paddle0.get_rect(), score0);
 
 		if(check_loss(ball.get_rect(), win_h)) {
 			//if ball lost, decrement lives, end game if lives == 0
@@ -566,22 +549,7 @@ void make_bricks(vector<shared_ptr<Brick>>& _bricks,
 	}
 }
 
-char coll_detect(SDL_Rect* _a, SDL_Rect* _b)
-{
-	if(_a->x > _b->x + _b->w
-	|| _a->x + _a->w < _b->x
-	|| _a->y > _b->y + _b->h
-	|| _a->y + _a->h < _b->y
-	) {
-		return 0;
-	}
-
-	else {
-		return 1;
-	}
-}
-
-coll_data* coll_detect_new(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
+coll_data* coll_detect(SDL_Rect* _a, short _a_spd, vec2 _a_dir, SDL_Rect* _b)
 {
 	if(_a->x > _b->x + _b->w
 	|| _a->x + _a->w < _b->x
