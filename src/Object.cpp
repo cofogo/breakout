@@ -34,7 +34,4 @@ void Object::render(SDL_Renderer* _ren)
 	SDL_RenderCopy(_ren, m_texture.get(), NULL, &m_rect);
 }
 
-SDL_Rect* Object::get_rect()
-{
-	return &m_rect;
-}
+SDL_Rect* Object::get_rect() {return &m_rect;}

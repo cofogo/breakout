@@ -260,7 +260,8 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 		if(pause) {SDL_Delay(30); continue;}
 
 		//key pressed check
-		//TODO see if can be moved to loop above (maybe catch another type evnt)
+		/*TODO see if can be moved to loop above (maybe catch another type of
+		  event, like key press, key release or such) */
 		if(key_states[SDL_SCANCODE_LEFT]) {
 			paddle0.move_l();
 		}
@@ -270,17 +271,32 @@ void run_game(SDL_Renderer* _ren, const int _win_w, const int _win_h,
 
 		int old_score0 = score0;
 
-		//TODO return the closest brick on path, as the wrong brick sometimes gets hit when margins are small
+		//return the closest brick for collision
+		int ball_centre_x = ball.get_rect()->x + (ball.get_rect()->w /2);
+		int ball_centre_y = ball.get_rect()->y + (ball.get_rect()->h /2);
+		double closest_dist = 10000.0d;
+		unsigned closest_id = 0;
 		for(unsigned i = 0; i < bricks.size(); ++i) {
-			coll_data* coll = coll_detect(ball.get_rect(), ball.get_speed()
-			                  , ball.get_dir()
-				              , bricks[i]->get_rect());
-			if(coll != NULL) {
-				ball.coll_react(coll);
-				bricks[i] = bricks.back();
-				bricks.pop_back();
-				delete coll;
+			int brick_centre_x = bricks[i]->get_rect()->x
+			                   + (bricks[i]->get_rect()->w /2);
+			int brick_centre_y = bricks[i]->get_rect()->y
+			                   + (bricks[i]->get_rect()->h /2);
+			double dist = fabs(ball_centre_x - double(brick_centre_x))
+			            + fabs(ball_centre_y - double(brick_centre_y));
+			if(dist < closest_dist) {
+				closest_dist = dist;	
+				closest_id = i;
 			}
+		}
+
+		coll_data* coll = coll_detect(ball.get_rect(), ball.get_speed()
+						  , ball.get_dir()
+						  , bricks[closest_id]->get_rect());
+		if(coll != NULL) {
+			ball.coll_react(coll);
+			bricks[closest_id] = bricks.back();
+			bricks.pop_back();
+			delete coll;
 		}
 
 		ball.update(win_w, win_h, paddle0.get_rect(), score0);
@@ -534,12 +550,15 @@ void load_endgame_screen(const string& _end_txt, SDL_Renderer* _ren)
 void make_bricks(vector<shared_ptr<Brick>>& _bricks,
                  shared_ptr<SDL_Texture> _tex)
 {
-	unsigned short cols = 10, rows = 5;
+	unsigned short cols = 10;
+	unsigned short rows = 5;
+	unsigned short gap_x = 3;
+	unsigned short gap_y = gap_x;
 
 	for(unsigned short i = 0; i < cols; ++i) {
 		for(unsigned short j = 0; j < rows; ++j) {
-			int x = 20 + (i * 60);
-			int y = 20 + (j * 30);
+			int x = 20 + (i * 60) + (gap_x * i);
+			int y = 20 + (j * 30) + (gap_y * j);
 			_bricks.push_back(shared_ptr<Brick> (new Brick(SDL_Rect{x, y})));
 		}
 	}

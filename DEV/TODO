@@ -55,10 +55,10 @@ TODO - cofogo
 - [x] 03-14 collision engine - untangle collision detection from colission reaction
 - [x] 03-24 collision engine - generalise collision detection more by returning data
 - [x] 03-26 collision engine - move collisions to new framework and test
+- [x] 03-27 collision engine - solve issue: when colission should happen very close to another brick, sometimes wrong brick is returned by collision detection
 - [ ] 03-29 collision engine - multiple collisions per frame
-- [ ] collision engine - solve issue: when colission should happen very close to another brick, sometimes wrong brick is returned by collision detection
 
 TODO - luke1222
 ===============
-- [ ] allign the brick aray to centre of scene
+- [ ] allign the brick array to centre of scene
 - [ ] stop paddle from moving outside the edges of the scene
